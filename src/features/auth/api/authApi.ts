@@ -1,21 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
-import { login, register, refreshToken } from '@/lib/mockApi';
-import type { LoginRequest, RegisterRequest } from '@/types/global';
+import { login as mockLogin, register as mockRegister } from '@/lib/mockApi';
 
 export const useLogin = () => {
   return {
-    mutate: login,
+    mutate: mockLogin,
   };
 };
 
 export const useRegister = () => {
   return {
-    mutate: register,
-  };
-};
-
-export const useRefreshToken = () => {
-  return {
-    mutate: refreshToken,
+    mutate: mockRegister,
   };
 };
