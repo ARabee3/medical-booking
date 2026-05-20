@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  /* Medical Color Palette */
+  --color-primary: #0f766e;
+  --color-primary-light: #14b8a6;
+  --color-primary-lighter: #ccfbf1;
+  --color-secondary: #64748b;
+  --color-background: #ffffff;
+  --color-background-muted: #f8fafc;
+  --color-foreground: #0f172a;
+  --color-foreground-muted: #475569;
+  --color-destructive: #e11d48;
+  --color-destructive-light: #ffe4e6;
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  --color-success: #10b981;
+  --color-success-light: #d1fae5;
+  --color-info: #3b82f6;
+  --color-info-light: #dbeafe;
+  --color-border: #e2e8f0;
+  --color-border-focus: #0f766e;
+  --color-input: #ffffff;
+  --color-ring: #14b8a6;
+  --color-radius: 0.5rem;
+
+  /* Shadcn CSS Variables */
+  --color-background: 0 0% 100%;
+  --color-foreground: 222.2 84% 4.9%;
+  --color-card: 0 0% 100%;
+  --color-card-foreground: 222.2 84% 4.9%;
+  --color-popover: 0 0% 100%;
+  --color-popover-foreground: 222.2 84% 4.9%;
+  --color-primary: 174 84% 24%;
+  --color-primary-foreground: 0 0% 100%;
+  --color-secondary: 215 16% 47%;
+  --color-secondary-foreground: 0 0% 100%;
+  --color-muted: 210 40% 96.1%;
+  --color-muted-foreground: 215.4 16.3% 46.9%;
+  --color-accent: 174 84% 24%;
+  --color-accent-foreground: 0 0% 100%;
+  --color-destructive: 346 84% 50%;
+  --color-destructive-foreground: 0 0% 100%;
+  --color-border: 214.3 31.8% 91.4%;
+  --color-input: 214.3 31.8% 91.4%;
+  --color-ring: 174 84% 24%;
+  --color-radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
