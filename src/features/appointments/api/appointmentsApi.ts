@@ -67,7 +67,26 @@ export const useRescheduleAppointment = () => {
   return useMutation({
     mutationFn: ({ id, date, time }: { id: number; date: string; time: string }) =>
       updateAppointment(id, { date, time }),
-    onSuccess: () => {
+    onMutate: async ({ id, date, time }) => {
+      await queryClient.cancelQueries({ queryKey: ['appointments'] });
+
+      const previousAppointments = queryClient.getQueryData<Appointment[]>(['appointments']);
+
+      if (previousAppointments) {
+        queryClient.setQueryData<Appointment[]>(
+          ['appointments'],
+          previousAppointments.map((appt) => (appt.id === id ? { ...appt, date, time } : appt))
+        );
+      }
+
+      return { previousAppointments };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousAppointments) {
+        queryClient.setQueryData(['appointments'], context.previousAppointments);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
     },
   });
