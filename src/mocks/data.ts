@@ -3,7 +3,6 @@ import { User, Doctor, Appointment, AvailabilitySlot } from '@/types/global';
 // ==========================
 // Demo Accounts
 // ==========================
-
 export const mockUsers: User[] = [
   {
     id: 1,
@@ -65,8 +64,98 @@ export const mockUsers: User[] = [
     is_active: true,
     is_approved: true,
   },
+  // Additional users for pagination & status variety
+  {
+    id: 7,
+    email: 'omar.hassan@email.com',
+    password: 'pass123',
+    first_name: 'Omar',
+    last_name: 'Hassan',
+    role: 'PATIENT',
+    is_active: false,
+    is_approved: true,
+  },
+  {
+    id: 8,
+    email: 'lena.moore@hospital.com',
+    password: 'docpass111',
+    first_name: 'Lena',
+    last_name: 'Moore',
+    role: 'DOCTOR',
+    is_active: true,
+    is_approved: false, // Pending approval
+  },
+  {
+    id: 9,
+    email: 'carlos.mendez@email.com',
+    password: 'pass456',
+    first_name: 'Carlos',
+    last_name: 'Mendez',
+    role: 'PATIENT',
+    is_active: true,
+    is_approved: true,
+  },
+  {
+    id: 10,
+    email: 'nina.patel@hospital.com',
+    password: 'docpass222',
+    first_name: 'Nina',
+    last_name: 'Patel',
+    role: 'DOCTOR',
+    is_active: false,
+    is_approved: false, // Pending approval + blocked
+  },
+  {
+    id: 11,
+    email: 'alice.wong@email.com',
+    password: 'pass789',
+    first_name: 'Alice',
+    last_name: 'Wong',
+    role: 'PATIENT',
+    is_active: true,
+    is_approved: true,
+  },
+  {
+    id: 12,
+    email: 'james.butler@hospital.com',
+    password: 'docpass333',
+    first_name: 'James',
+    last_name: 'Butler',
+    role: 'DOCTOR',
+    is_active: true,
+    is_approved: false, // Pending approval
+  },
+  {
+    id: 13,
+    email: 'sara.lee@email.com',
+    password: 'pass321',
+    first_name: 'Sara',
+    last_name: 'Lee',
+    role: 'PATIENT',
+    is_active: false,
+    is_approved: true,
+  },
+  {
+    id: 14,
+    email: 'david.kim@email.com',
+    password: 'pass654',
+    first_name: 'David',
+    last_name: 'Kim',
+    role: 'PATIENT',
+    is_active: true,
+    is_approved: true,
+  },
+  {
+    id: 15,
+    email: 'fatma.ali@hospital.com',
+    password: 'docpass444',
+    first_name: 'Fatma',
+    last_name: 'Ali',
+    role: 'DOCTOR',
+    is_active: true,
+    is_approved: true,
+  },
 ];
-
 // ==========================
 // Doctors
 // ==========================
