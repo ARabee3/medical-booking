@@ -23,28 +23,6 @@
   --color-input: #ffffff;
   --color-ring: #14b8a6;
   --color-radius: 0.5rem;
-
-  /* Shadcn CSS Variables */
-  --color-background: 0 0% 100%;
-  --color-foreground: 222.2 84% 4.9%;
-  --color-card: 0 0% 100%;
-  --color-card-foreground: 222.2 84% 4.9%;
-  --color-popover: 0 0% 100%;
-  --color-popover-foreground: 222.2 84% 4.9%;
-  --color-primary: 174 84% 24%;
-  --color-primary-foreground: 0 0% 100%;
-  --color-secondary: 215 16% 47%;
-  --color-secondary-foreground: 0 0% 100%;
-  --color-muted: 210 40% 96.1%;
-  --color-muted-foreground: 215.4 16.3% 46.9%;
-  --color-accent: 174 84% 24%;
-  --color-accent-foreground: 0 0% 100%;
-  --color-destructive: 346 84% 50%;
-  --color-destructive-foreground: 0 0% 100%;
-  --color-border: 214.3 31.8% 91.4%;
-  --color-input: 214.3 31.8% 91.4%;
-  --color-ring: 174 84% 24%;
-  --color-radius: 0.5rem;
 }
 
 @layer base {
