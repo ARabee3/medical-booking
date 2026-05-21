@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { getAdminUsers, getAdminAppointments, getAdminStats } from '@/lib/mockApi';
-
 export const useAdminUsers = () => {
   return useQuery({
     queryKey: ['admin-users'],
