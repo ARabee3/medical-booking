@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { format, parseISO, parse } from 'date-fns';
 import { CalendarDays, Clock } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Appointment } from '@/features/appointments/types';
@@ -36,12 +36,12 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
           {/* Doctor Avatar */}
-          <Avatar className="h-14 w-14 flex-shrink-0">
-            <AvatarImage src={doctor.image_url ?? undefined} alt={doctor.name} />
-            <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-sm">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          <Avatar
+            className="h-14 w-14 flex-shrink-0"
+            src={doctor.image_url ?? undefined}
+            alt={doctor.name}
+            fallback={initials}
+          />
 
           {/* Main content */}
           <div className="flex-1 min-w-0">
