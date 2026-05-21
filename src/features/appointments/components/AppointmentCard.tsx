@@ -4,6 +4,7 @@ import { CalendarDays, Clock } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import type { Appointment } from '@/features/appointments/types';
 import { getStatusBadgeConfig } from '@/features/appointments/utils';
 
@@ -78,6 +79,31 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
             )}
           </div>
         </div>
+
+        {/* Action Buttons */}
+        {status !== 'CANCELLED' && (
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            {(status === 'PENDING' || status === 'CONFIRMED') && (
+              <>
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                  Reschedule
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 sm:flex-none text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                >
+                  Cancel
+                </Button>
+              </>
+            )}
+            {status === 'COMPLETED' && (
+              <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                Leave Review
+              </Button>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

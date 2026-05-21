@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { isPast, parseISO, parse, isToday } from 'date-fns';
 import { CalendarHeart } from 'lucide-react';
@@ -103,6 +103,7 @@ const AppointmentTabContent: FC<AppointmentTabContentProps> = ({ appointments, t
 // ─── Main page component (US-014) ──────────────────────────────────────────
 export const AppointmentList: FC = () => {
   const { data: appointments, isLoading, isError, error, refetch } = useAppointments();
+  const [activeTab, setActiveTab] = useState<string>('upcoming');
 
   /**
    * Split appointments into "Upcoming" vs "Past".
@@ -156,7 +157,7 @@ export const AppointmentList: FC = () => {
 
       {/* ── Tabs ── */}
       {!isError && (
-        <Tabs defaultValue="upcoming" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 w-full sm:w-auto">
             <TabsTrigger value="upcoming" id="tab-upcoming" className="flex-1 sm:flex-none">
               Upcoming
