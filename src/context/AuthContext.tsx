@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { User } from '@/types/global';
 import { login as mockLogin } from '@/lib/mockApi';
