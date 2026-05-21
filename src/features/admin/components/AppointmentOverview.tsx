@@ -12,11 +12,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAdminAppointments } from '@/features/admin/api/adminApi';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { ErrorMessage } from '@/components/ErrorMessage';
 import type { Appointment } from '@/types/global';
 
-interface AppointmentOverviewProps {
-  appointments: Appointment[];
-}
+// ─── Status Badge ─────────────────────────────────────────────
 
 const StatusBadge: FC<{ status: Appointment['status'] }> = ({ status }) => {
   switch (status) {
@@ -39,73 +40,101 @@ const StatusBadge: FC<{ status: Appointment['status'] }> = ({ status }) => {
   }
 };
 
-export const AppointmentOverview: FC<AppointmentOverviewProps> = ({ appointments }) => {
+// ─── Table UI (reusable internally) ──────────────────────────
+
+const AppointmentTable: FC<{ appointments: Appointment[] }> = ({ appointments }) => (
+  <div className="overflow-x-auto">
+    <Table>
+      <TableHeader>
+        <TableRow className="bg-muted/50">
+          <TableHead className="font-semibold text-foreground">Doctor</TableHead>
+          <TableHead className="font-semibold text-foreground">Specialty</TableHead>
+          <TableHead className="font-semibold text-foreground">Date & Time</TableHead>
+          <TableHead className="font-semibold text-foreground">Status</TableHead>
+          <TableHead className="font-semibold text-foreground text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {appointments.map((appointment) => (
+          <TableRow key={appointment.id} className="hover:bg-muted/30">
+            <TableCell className="font-medium text-foreground">{appointment.doctor.name}</TableCell>
+            <TableCell className="text-muted-foreground">{appointment.doctor.specialty}</TableCell>
+            <TableCell className="text-muted-foreground">
+              <span className="block">
+                {format(parseISO(appointment.date), 'EEE, MMM d, yyyy')}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {format(parseISO(`${appointment.date}T${appointment.time}`), 'h:mm a')}
+              </span>
+            </TableCell>
+            <TableCell>
+              <StatusBadge status={appointment.status} />
+            </TableCell>
+            <TableCell className="text-right">
+              <div className="flex items-center justify-end gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
+                  title="View Details"
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                  title="Cancel Appointment"
+                  disabled={
+                    appointment.status === 'CANCELLED' || appointment.status === 'COMPLETED'
+                  }
+                >
+                  <XCircle className="h-4 w-4" />
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </div>
+);
+
+// ─── Main Export: works both as standalone page & embedded ────
+
+export const AppointmentOverview: FC = () => {
+  const { data: appointments, isLoading, isError, error, refetch } = useAdminAppointments();
+
+  if (isLoading) return <LoadingSpinner />;
+  if (isError)
+    return (
+      <ErrorMessage
+        message={error instanceof Error ? error.message : 'Failed to load appointments'}
+        onRetry={refetch}
+      />
+    );
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold text-foreground">Recent Appointments</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="font-semibold text-foreground">Doctor</TableHead>
-                <TableHead className="font-semibold text-foreground">Specialty</TableHead>
-                <TableHead className="font-semibold text-foreground">Date & Time</TableHead>
-                <TableHead className="font-semibold text-foreground">Status</TableHead>
-                <TableHead className="font-semibold text-foreground text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {appointments.map((appointment) => (
-                <TableRow key={appointment.id} className="hover:bg-muted/30">
-                  <TableCell className="font-medium text-foreground">
-                    {appointment.doctor.name}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {appointment.doctor.specialty}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    <span className="block">
-                      {format(parseISO(appointment.date), 'EEE, MMM d, yyyy')}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {format(parseISO(`${appointment.date}T${appointment.time}`), 'h:mm a')}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <StatusBadge status={appointment.status} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
-                        title="View Details"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-                        title="Cancel Appointment"
-                        disabled={
-                          appointment.status === 'CANCELLED' || appointment.status === 'COMPLETED'
-                        }
-                      >
-                        <XCircle className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="px-4 md:px-8 lg:px-12 py-8 space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Appointments</h1>
+        <p className="text-sm text-muted-foreground mt-1">All system appointments overview</p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-foreground">
+            Recent Appointments
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {appointments && appointments.length === 0 ? (
+            <p className="text-center py-10 text-muted-foreground">No appointments found.</p>
+          ) : (
+            <AppointmentTable appointments={appointments ?? []} />
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };

@@ -54,7 +54,7 @@ const StatusBadge: FC<{ isActive: boolean }> = ({ isActive }) => {
 
 // ─── Main Component ───────────────────────────────────────────
 
-export const UserManagement: FC = () => {
+export const UserTable: FC = () => {
   const { data: users, isLoading, isError, error, refetch } = useAdminUsers();
   const { mutate: updateUser, isPending } = useUpdateAdminUser();
 
