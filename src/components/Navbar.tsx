@@ -3,6 +3,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Stethoscope } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -12,6 +13,7 @@ export const Navbar = () => {
 
   const handleLogout = () => {
     logout();
+    toast.success('Logged out successfully');
     navigate('/login');
   };
 
