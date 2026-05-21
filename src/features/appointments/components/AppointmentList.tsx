@@ -159,7 +159,7 @@ export const AppointmentList: FC = () => {
       {!isError && (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 w-full sm:w-auto">
-            <TabsTrigger value="upcoming" id="tab-upcoming" className="flex-1 sm:flex-none">
+            <TabsTrigger value="upcoming" className="flex-1 sm:flex-none">
               Upcoming
               {!isLoading && upcoming.length > 0 && (
                 <span className="ml-2 inline-flex items-center justify-center rounded-full bg-teal-100 text-teal-700 text-xs font-semibold px-2 py-0.5 leading-none">
@@ -167,7 +167,7 @@ export const AppointmentList: FC = () => {
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="past" id="tab-past" className="flex-1 sm:flex-none">
+            <TabsTrigger value="past" className="flex-1 sm:flex-none">
               Past
               {!isLoading && past.length > 0 && (
                 <span className="ml-2 inline-flex items-center justify-center rounded-full bg-slate-100 text-slate-600 text-xs font-semibold px-2 py-0.5 leading-none">

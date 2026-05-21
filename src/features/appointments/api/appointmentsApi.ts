@@ -49,7 +49,7 @@ export const useCancelAppointment = () => {
       // Return a context object with the snapshotted value
       return { previousAppointments };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousAppointments) {
         queryClient.setQueryData(['appointments'], context.previousAppointments);
@@ -108,7 +108,7 @@ export const useUpdateDoctorAppointment = () => {
 
       return { previousAppointments };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       if (context?.previousAppointments) {
         queryClient.setQueryData(['doctorAppointments'], context.previousAppointments);
       }
