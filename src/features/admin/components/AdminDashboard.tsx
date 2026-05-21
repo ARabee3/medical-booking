@@ -1,18 +1,43 @@
 import { FC } from 'react';
 import { StatCards } from '@/features/admin/components/StatCards';
+import { AppointmentOverview } from '@/features/admin/components/AppointmentOverview';
 import { useAdminStats } from '@/features/admin/api/adminApi';
+import { useAdminAppointments } from '@/features/admin/api/adminApi';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { ErrorMessage } from '@/components/ErrorMessage';
 
 export const AdminDashboard: FC = () => {
-  const { data: stats, isLoading, isError, error, refetch } = useAdminStats();
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    isError: statsError,
+    error: statsErr,
+    refetch: refetchStats,
+  } = useAdminStats();
 
-  if (isLoading) return <LoadingSpinner />;
-  if (isError)
+  const {
+    data: appointments,
+    isLoading: appsLoading,
+    isError: appsError,
+    error: appsErr,
+    refetch: refetchApps,
+  } = useAdminAppointments();
+
+  if (statsLoading || appsLoading) return <LoadingSpinner />;
+
+  if (statsError)
     return (
       <ErrorMessage
-        message={error instanceof Error ? error.message : 'Failed to load stats'}
-        onRetry={refetch}
+        message={statsErr instanceof Error ? statsErr.message : 'Failed to load stats'}
+        onRetry={refetchStats}
+      />
+    );
+
+  if (appsError)
+    return (
+      <ErrorMessage
+        message={appsErr instanceof Error ? appsErr.message : 'Failed to load appointments'}
+        onRetry={refetchApps}
       />
     );
 
@@ -26,6 +51,9 @@ export const AdminDashboard: FC = () => {
 
       {/* Stat Cards */}
       {stats && <StatCards stats={stats} />}
+
+      {/* Recent Appointments Table */}
+      {appointments && <AppointmentOverview appointments={appointments} />}
     </div>
   );
 };
