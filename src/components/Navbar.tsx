@@ -3,6 +3,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Stethoscope } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -12,6 +13,7 @@ export const Navbar = () => {
 
   const handleLogout = () => {
     logout();
+    toast.success('Logged out successfully');
     navigate('/login');
   };
 
@@ -89,11 +91,7 @@ export const Navbar = () => {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
 
@@ -115,7 +113,12 @@ export const Navbar = () => {
               </Link>
             ))}
             {isAuthenticated && (
-              <Button variant="ghost" size="sm" className="w-full justify-start" onClick={handleLogout}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+                onClick={handleLogout}
+              >
                 Logout
               </Button>
             )}

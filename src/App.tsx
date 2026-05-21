@@ -50,7 +50,12 @@ export default function App() {
 
               {/* Doctor Routes */}
               <Route element={<PrivateRoute allowedRoles={['DOCTOR']} />}>
-                <Route path="/doctor/schedule" element={<div className="text-center p-8">Doctor Schedule — Mokhtar (US-019)</div>} />
+                <Route
+                  path="/doctor/schedule"
+                  element={
+                    <div className="text-center p-8">Doctor Schedule — Mokhtar (US-019)</div>
+                  }
+                />
                 <Route path="/doctor/appointments" element={<DoctorAppointmentDashboard />} />
               </Route>
 
