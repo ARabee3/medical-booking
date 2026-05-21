@@ -1,10 +1,21 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { format, parseISO, parse } from 'date-fns';
-import { CalendarDays, Clock } from 'lucide-react';
+import { CalendarDays, Clock, Loader2 } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { toast } from 'sonner';
+import { useCancelAppointment } from '@/features/appointments/api/appointmentsApi';
 import type { Appointment } from '@/features/appointments/types';
 import { getStatusBadgeConfig } from '@/features/appointments/utils';
 
@@ -13,7 +24,21 @@ interface AppointmentCardProps {
 }
 
 export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
-  const { doctor, date, time, status, notes } = appointment;
+  const { id, doctor, date, time, status, notes } = appointment;
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const cancelMutation = useCancelAppointment();
+
+  const handleCancel = () => {
+    cancelMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success('Appointment cancelled successfully.');
+        setIsCancelDialogOpen(false);
+      },
+      onError: (error) => {
+        toast.error(error.message || 'Failed to cancel appointment.');
+      },
+    });
+  };
 
   // Format date: "Mon, Jan 20, 2026"
   const formattedDate = format(parseISO(date), 'EEE, MMM d, yyyy');
@@ -88,13 +113,50 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                 <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
                   Reschedule
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 sm:flex-none text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                >
-                  Cancel
-                </Button>
+
+                <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 sm:flex-none text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                    >
+                      Cancel
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Cancel Appointment</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to cancel your appointment with {doctor.name}? This
+                        action cannot be undone.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="mt-4 gap-2 sm:gap-0">
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsCancelDialogOpen(false)}
+                        disabled={cancelMutation.isPending}
+                      >
+                        Keep Appointment
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleCancel}
+                        disabled={cancelMutation.isPending}
+                      >
+                        {cancelMutation.isPending ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Cancelling...
+                          </>
+                        ) : (
+                          'Yes, Cancel it'
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </>
             )}
             {status === 'COMPLETED' && (
