@@ -84,7 +84,6 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   };
 
   const formattedDate = format(parseISO(date), 'EEEE, MMMM d, yyyy');
-  // Assuming time is in HH:mm format (24h), convert to 12h for display
   const parsedTime = parse(time, 'HH:mm', new Date());
   const formattedTime = format(parsedTime, 'h:mm a');
 
@@ -92,7 +91,8 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
 
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-md border-[var(--color-border)]">
-      <CardContent className="p-0">
+      <CardContent className="p-0 flex flex-col justify-between h-full">
+        {/* Main Info Body */}
         <div className="flex flex-col sm:flex-row sm:items-start p-6 gap-6">
           {/* Avatar Section */}
           <div className="flex-shrink-0">
@@ -142,15 +142,15 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons Section */}
         {status !== 'CANCELLED' && (
-          <div className="bg-[var(--color-muted)]/30 border-t border-[var(--color-border)] p-4 flex flex-wrap items-center justify-end gap-3">
+          <div className="flex flex-row items-center justify-start gap-3 bg-[var(--color-muted)]/20 border-t border-[var(--color-border)] p-4 w-full">
             {(status === 'PENDING' || status === 'CONFIRMED') && (
               <>
                 {/* ─── Reschedule Dialog ─── */}
                 <Dialog open={isRescheduleDialogOpen} onOpenChange={handleRescheduleDialogChange}>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+                    <Button variant="outline" size="sm" className="w-full sm:w-auto">
                       Reschedule
                     </Button>
                   </DialogTrigger>
@@ -172,7 +172,7 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                           />
                         </div>
 
-                        <DialogFooter className="mt-2">
+                        <DialogFooter className="mt-2 gap-2 sm:gap-0">
                           <Button
                             variant="outline"
                             onClick={() => setIsRescheduleDialogOpen(false)}
@@ -231,7 +231,7 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                           </div>
                         </div>
 
-                        <DialogFooter>
+                        <DialogFooter className="gap-2 sm:gap-0">
                           <Button
                             variant="outline"
                             onClick={() => setRescheduleStep('calendar')}
@@ -265,7 +265,7 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 sm:flex-none text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                      className="w-full sm:w-auto text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
                     >
                       Cancel
                     </Button>
@@ -306,7 +306,7 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               </>
             )}
             {status === 'COMPLETED' && (
-              <Button variant="outline" size="sm" className="flex-1 sm:flex-none">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto">
                 Leave Review
               </Button>
             )}
