@@ -24,9 +24,7 @@ const registerSchema = z
     email: z.string().email('Invalid email address'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     password_confirm: z.string().min(1, 'Please confirm your password'),
-    role: z.enum(['PATIENT', 'DOCTOR'], {
-      required_error: 'Please select a role',
-    }),
+    role: z.enum(['PATIENT', 'DOCTOR']),
   })
   .refine((data) => data.password === data.password_confirm, {
     message: 'Passwords do not match',
@@ -217,11 +215,7 @@ export const RegisterForm: FC = () => {
                 )}
               />
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={form.formState.isSubmitting}
-              >
+              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting ? 'Creating account...' : 'Create account'}
               </Button>
             </form>

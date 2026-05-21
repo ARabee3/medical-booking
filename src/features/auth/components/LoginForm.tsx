@@ -108,11 +108,7 @@ export const LoginForm: FC = () => {
                 )}
               />
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={form.formState.isSubmitting}
-              >
+              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting ? 'Signing in...' : 'Sign in'}
               </Button>
             </form>
