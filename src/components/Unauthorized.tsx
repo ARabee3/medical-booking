@@ -10,7 +10,8 @@ export const Unauthorized = () => {
       <ShieldAlert className="h-16 w-16 text-[var(--color-destructive)]" />
       <h1 className="text-3xl font-bold text-[var(--color-foreground)]">Access Denied</h1>
       <p className="text-[var(--color-foreground-muted)] max-w-md">
-        You do not have permission to access this page. Please contact your administrator if you believe this is an error.
+        You do not have permission to access this page. Please contact your administrator if you
+        believe this is an error.
       </p>
       <Button onClick={() => navigate('/')} variant="outline">
         Go Home
