@@ -1,13 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  getDoctors,
-  getDoctorById,
-  getDoctorAvailability,
-  getDoctorSlots,
-  addAvailability,
-  deleteAvailability,
-} from '@/lib/mockApi';
-import type { AvailabilitySlot } from '@/types/global';
+import { useQuery } from '@tanstack/react-query';
+import { getDoctors, getDoctorById, getDoctorAvailability } from '@/lib/mockApi';
 
 export const useDoctors = (specialty?: string) => {
   return useQuery({
@@ -29,39 +21,5 @@ export const useDoctorAvailability = (doctorId: number, date: string) => {
     queryKey: ['availability', doctorId, date],
     queryFn: () => getDoctorAvailability(doctorId, date),
     enabled: !!doctorId && !!date,
-  });
-};
-
-export const useDoctorSlots = (doctorId: number) => {
-  return useQuery<AvailabilitySlot[]>({
-    queryKey: ['doctor-slots', doctorId],
-    queryFn: () => getDoctorSlots(doctorId),
-    enabled: !!doctorId,
-  });
-};
-
-export const useAddSlot = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (slot: Omit<AvailabilitySlot, 'id'>) => addAvailability(slot),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['doctor-slots', variables.doctor_id],
-      });
-    },
-  });
-};
-
-export const useDeleteSlot = (doctorId: number) => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: number) => deleteAvailability(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['doctor-slots', doctorId],
-      });
-    },
   });
 };

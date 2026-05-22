@@ -15,8 +15,7 @@ const avatarVariants = cva('relative flex h-10 w-10 shrink-0 overflow-hidden rou
   },
 });
 
-interface AvatarProps
-  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof avatarVariants> {
+interface AvatarProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof avatarVariants> {
   src?: string | null;
   alt?: string;
   fallback?: string;

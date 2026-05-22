@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
@@ -10,8 +9,10 @@ const badgeVariants = cva(
       variant: {
         default:
           'border-transparent bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-light)]',
-        secondary: 'border-transparent bg-[var(--color-secondary)] text-white hover:bg-slate-600',
-        destructive: 'border-transparent bg-[var(--color-destructive)] text-white hover:bg-red-600',
+        secondary:
+          'border-transparent bg-[var(--color-secondary)] text-white hover:bg-slate-600',
+        destructive:
+          'border-transparent bg-[var(--color-destructive)] text-white hover:bg-red-600',
         outline: 'text-[var(--color-foreground)]',
       },
     },
@@ -22,10 +23,13 @@ const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
-  return <div className={cn(badgeVariants({ variant }), className)} {...props} />;
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  );
 }
 
 export { Badge, badgeVariants };
