@@ -4,10 +4,13 @@ import {
   getDoctorById,
   getDoctorAvailability,
   getDoctorSlots,
+  getDoctorByUserId,
+  updateDoctor,
   addAvailability,
   deleteAvailability,
 } from '@/lib/mockApi';
-import type { AvailabilitySlot } from '@/types/global';
+import { useAuth } from '@/context/AuthContext';
+import type { AvailabilitySlot, Doctor } from '@/types/global';
 
 export const useDoctors = (specialty?: string) => {
   return useQuery({
@@ -37,6 +40,30 @@ export const useDoctorSlots = (doctorId: number) => {
     queryKey: ['doctor-slots', doctorId],
     queryFn: () => getDoctorSlots(doctorId),
     enabled: !!doctorId,
+  });
+};
+
+export const useCurrentDoctor = () => {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['doctor', 'me', user?.id],
+    queryFn: () => getDoctorByUserId(user!.id),
+    enabled: !!user && user.role === 'DOCTOR',
+  });
+};
+
+export const useUpdateDoctor = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, updates }: { id: number; updates: Partial<Doctor> }) =>
+      updateDoctor(id, updates),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['doctor', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['doctor', 'me'] });
+      queryClient.invalidateQueries({ queryKey: ['doctors'] });
+    },
   });
 };
 

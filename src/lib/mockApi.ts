@@ -114,6 +114,22 @@ export const getDoctorAvailability = async (doctorId: number, date: string): Pro
   return slots.map((s) => s.start_time);
 };
 
+export const getDoctorByUserId = async (userId: number): Promise<Doctor> => {
+  await delay(300);
+  const doctor = mockDoctors.find((d) => d.user_id === userId);
+  if (!doctor) throw new Error('Doctor profile not found');
+  return { ...doctor };
+};
+
+export const updateDoctor = async (id: number, updates: Partial<Doctor>): Promise<Doctor> => {
+  await delay(400);
+  const doctor = mockDoctors.find((d) => d.id === id);
+  if (!doctor) throw new Error('Doctor not found');
+
+  Object.assign(doctor, updates);
+  return { ...doctor };
+};
+
 export const getDoctorSlots = async (doctorId: number): Promise<AvailabilitySlot[]> => {
   await delay(200);
   return mockAvailability.filter((a) => a.doctor_id === doctorId);

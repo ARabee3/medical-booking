@@ -35,6 +35,7 @@ export const Navbar = () => {
         return [
           { label: 'My Schedule', path: '/doctor/schedule' },
           { label: 'My Appointments', path: '/doctor/appointments' },
+          { label: 'My Profile', path: '/doctor/profile' },
         ];
       case 'ADMIN':
         return [
