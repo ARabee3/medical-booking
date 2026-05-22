@@ -22,7 +22,7 @@ import { DoctorAppointmentDashboard } from '@/features/appointments/components/D
 
 // Admin (Mokhtar)
 import { AdminDashboard } from '@/features/admin/components/AdminDashboard';
-import { UserTable } from '@/features/admin/components/UserTable';
+import { UserTable } from './features/admin/components/UserTable';
 import { AppointmentOverview } from '@/features/admin/components/AppointmentOverview';
 
 // Doctor Tools (Mokhtar)

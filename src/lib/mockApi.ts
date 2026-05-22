@@ -114,6 +114,10 @@ export const getDoctorAvailability = async (doctorId: number, date: string): Pro
   return slots.map((s) => s.start_time);
 };
 
+export const getDoctorSlots = async (doctorId: number): Promise<AvailabilitySlot[]> => {
+  await delay(200);
+  return mockAvailability.filter((a) => a.doctor_id === doctorId);
+};
 // ==========================
 // Appointments (Patient)
 // ==========================
