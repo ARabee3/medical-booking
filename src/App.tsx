@@ -27,7 +27,7 @@ import { UserTable } from './features/admin/components/UserTable';
 import { AppointmentOverview } from '@/features/admin/components/AppointmentOverview';
 
 // Doctor Tools (Mokhtar)
-// import { DoctorScheduleForm } from '@/features/doctors/components/DoctorScheduleForm'; // Will be added by Mokhtar
+import { ScheduleManagement } from '@/features/doctors/components/ScheduleManagement';
 
 export default function App() {
   return (
@@ -53,12 +53,7 @@ export default function App() {
 
               {/* Doctor Routes */}
               <Route element={<PrivateRoute allowedRoles={['DOCTOR']} />}>
-                <Route
-                  path="/doctor/schedule"
-                  element={
-                    <div className="text-center p-8">Doctor Schedule — Mokhtar (US-019)</div>
-                  }
-                />
+                <Route path="/doctor/schedule" element={<ScheduleManagement />} />
                 <Route path="/doctor/appointments" element={<DoctorAppointmentDashboard />} />
               </Route>
 
