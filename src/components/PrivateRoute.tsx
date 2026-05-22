@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import type { UserRole } from '@/types/global';
 
@@ -8,7 +8,6 @@ interface PrivateRouteProps {
 
 export const PrivateRoute = ({ allowedRoles }: PrivateRouteProps) => {
   const { isAuthenticated, user, isLoading } = useAuth();
-  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -19,8 +18,7 @@ export const PrivateRoute = ({ allowedRoles }: PrivateRouteProps) => {
   }
 
   if (!isAuthenticated) {
-    // Save the current location so we can redirect back after login
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" replace />;
   }
 
   if (allowedRoles && user?.role && !allowedRoles.includes(user.role)) {

@@ -23,9 +23,7 @@ const delay = (ms: number) => new Promise<void>((res) => setTimeout(res, ms));
 // Auth
 // ==========================
 
-export const login = async (
-  credentials: LoginRequest
-): Promise<{ user: User; access: string; refresh: string }> => {
+export const login = async (credentials: LoginRequest): Promise<{ user: User; access: string; refresh: string }> => {
   await delay(300);
   const user = mockUsers.find(
     (u) => u.email === credentials.email && u.password === credentials.password
@@ -40,9 +38,7 @@ export const login = async (
   };
 };
 
-export const register = async (
-  request: RegisterRequest
-): Promise<{ user: User; access: string; refresh: string }> => {
+export const register = async (request: RegisterRequest): Promise<{ user: User; access: string; refresh: string }> => {
   await delay(400);
   const existing = mockUsers.find((u) => u.email === request.email);
   if (existing) {
@@ -114,10 +110,6 @@ export const getDoctorAvailability = async (doctorId: number, date: string): Pro
   return slots.map((s) => s.start_time);
 };
 
-export const getDoctorSlots = async (doctorId: number): Promise<AvailabilitySlot[]> => {
-  await delay(200);
-  return mockAvailability.filter((a) => a.doctor_id === doctorId);
-};
 // ==========================
 // Appointments (Patient)
 // ==========================
@@ -133,11 +125,7 @@ export const bookAppointment = async (request: BookingRequest): Promise<Appointm
   if (!doctor) throw new Error('Doctor not found');
 
   const existing = mockAppointments.find(
-    (a) =>
-      a.doctor.id === request.doctor_id &&
-      a.date === request.date &&
-      a.time === request.time &&
-      a.status !== 'CANCELLED'
+    (a) => a.doctor.id === request.doctor_id && a.date === request.date && a.time === request.time && a.status !== 'CANCELLED'
   );
   if (existing) {
     throw Object.assign(new Error('This time slot is already booked'), {
@@ -158,8 +146,7 @@ export const bookAppointment = async (request: BookingRequest): Promise<Appointm
 
   // Mark availability as booked
   const slot = mockAvailability.find(
-    (a) =>
-      a.doctor_id === request.doctor_id && a.date === request.date && a.start_time === request.time
+    (a) => a.doctor_id === request.doctor_id && a.date === request.date && a.start_time === request.time
   );
   if (slot) slot.is_booked = true;
 
@@ -204,9 +191,7 @@ export const updateDoctorAppointment = async (
   return appointment;
 };
 
-export const addAvailability = async (
-  slot: Omit<AvailabilitySlot, 'id'>
-): Promise<AvailabilitySlot> => {
+export const addAvailability = async (slot: Omit<AvailabilitySlot, 'id'>): Promise<AvailabilitySlot> => {
   await delay(300);
   const newSlot: AvailabilitySlot = {
     ...slot,
@@ -249,12 +234,7 @@ export const getAdminAppointments = async (): Promise<Appointment[]> => {
   return [...mockAppointments];
 };
 
-export const getAdminStats = async (): Promise<{
-  totalUsers: number;
-  totalDoctors: number;
-  totalAppointments: number;
-  pendingApprovals: number;
-}> => {
+export const getAdminStats = async (): Promise<{ totalUsers: number; totalDoctors: number; totalAppointments: number; pendingApprovals: number }> => {
   await delay(200);
   return mockAdminStats;
 };

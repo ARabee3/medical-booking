@@ -1,15 +1,12 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
-import { User, RegisterRequest } from '@/types/global';
-import { login as mockLogin, register as mockRegister } from '@/lib/mockApi';
-import { queryClient } from '@/lib/queryClient';
+import { User } from '@/types/global';
+import { login as mockLogin } from '@/lib/mockApi';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (request: RegisterRequest) => Promise<void>;
   logout: () => void;
   hasRole: (role: string) => boolean;
 }
@@ -36,24 +33,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const register = useCallback(async (request: RegisterRequest) => {
-    setIsLoading(true);
-    try {
-      const { user: newUser, access, refresh } = await mockRegister(request);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      localStorage.setItem('access', access);
-      localStorage.setItem('refresh', refresh);
-      setUser(newUser);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   const logout = useCallback(() => {
     localStorage.removeItem('user');
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
-    queryClient.clear();
     setUser(null);
   }, []);
 
@@ -71,7 +54,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated: !!user,
         isLoading,
         login,
-        register,
         logout,
         hasRole,
       }}

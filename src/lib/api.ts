@@ -23,18 +23,10 @@ api.interceptors.request.use(
 
 // Response interceptor: handle 401 and refresh token
 let isRefreshing = false;
-let refreshSubscribers: {
-  resolve: (token: string) => void;
-  reject: (error: unknown) => void;
-}[] = [];
+let refreshSubscribers: ((token: string) => void)[] = [];
 
 function onRefreshed(token: string) {
-  refreshSubscribers.forEach((cb) => cb.resolve(token));
-  refreshSubscribers = [];
-}
-
-function onRefreshFailed(error: unknown) {
-  refreshSubscribers.forEach((cb) => cb.reject(error));
+  refreshSubscribers.forEach((cb) => cb(token));
   refreshSubscribers = [];
 }
 
@@ -64,7 +56,6 @@ api.interceptors.response.use(
           return api(originalRequest);
         } catch (refreshError) {
           isRefreshing = false;
-          onRefreshFailed(refreshError);
           localStorage.removeItem('access');
           localStorage.removeItem('refresh');
           window.location.href = '/login';
@@ -73,17 +64,12 @@ api.interceptors.response.use(
       }
 
       // Wait for refresh to complete
-      return new Promise((resolve, reject) => {
-        refreshSubscribers.push({
-          resolve: (token: string) => {
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-            }
-            resolve(api(originalRequest));
-          },
-          reject: (err: unknown) => {
-            reject(err);
-          },
+      return new Promise((resolve) => {
+        refreshSubscribers.push((token: string) => {
+          if (originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+          }
+          resolve(api(originalRequest));
         });
       });
     }

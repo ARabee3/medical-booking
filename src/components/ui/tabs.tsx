@@ -29,34 +29,15 @@ function useTabs() {
   return context;
 }
 
-export const TabsList = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
+export const TabsList = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return (
-    <div
-      className={cn(
-        'inline-flex h-10 items-center justify-center rounded-md bg-[var(--color-muted)] p-1 text-[var(--color-muted-foreground)]',
-        className
-      )}
-    >
+    <div className={cn('inline-flex h-10 items-center justify-center rounded-md bg-[var(--color-muted)] p-1 text-[var(--color-muted-foreground)]', className)}>
       {children}
     </div>
   );
 };
 
-export const TabsTrigger = ({
-  value,
-  children,
-  className,
-}: {
-  value: string;
-  children: React.ReactNode;
-  className?: string;
-}) => {
+export const TabsTrigger = ({ value, children, className }: { value: string; children: React.ReactNode; className?: string }) => {
   const { value: activeValue, onValueChange } = useTabs();
   const isActive = activeValue === value;
   return (
@@ -75,24 +56,11 @@ export const TabsTrigger = ({
   );
 };
 
-export const TabsContent = ({
-  value,
-  children,
-  className,
-}: {
-  value: string;
-  children: React.ReactNode;
-  className?: string;
-}) => {
+export const TabsContent = ({ value, children, className }: { value: string; children: React.ReactNode; className?: string }) => {
   const { value: activeValue } = useTabs();
   if (activeValue !== value) return null;
   return (
-    <div
-      className={cn(
-        'mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        className
-      )}
-    >
+    <div className={cn('mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2', className)}>
       {children}
     </div>
   );
