@@ -174,6 +174,30 @@ export const updateAppointment = async (
   const appointment = mockAppointments.find((a) => a.id === id);
   if (!appointment) throw new Error('Appointment not found');
 
+  if (
+    updates.date &&
+    updates.time &&
+    (appointment.date !== updates.date || appointment.time !== updates.time)
+  ) {
+    // Free old slot
+    const oldSlot = mockAvailability.find(
+      (a) =>
+        a.doctor_id === appointment.doctor.id &&
+        a.date === appointment.date &&
+        a.start_time === appointment.time
+    );
+    if (oldSlot) oldSlot.is_booked = false;
+
+    // Book new slot
+    const newSlot = mockAvailability.find(
+      (a) =>
+        a.doctor_id === appointment.doctor.id &&
+        a.date === updates.date &&
+        a.start_time === updates.time
+    );
+    if (newSlot) newSlot.is_booked = true;
+  }
+
   if (updates.status) appointment.status = updates.status;
   if (updates.date) appointment.date = updates.date;
   if (updates.time) appointment.time = updates.time;
