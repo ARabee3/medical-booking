@@ -15,6 +15,7 @@ import { RegisterForm } from '@/features/auth/components/RegisterForm';
 // Doctors / Patient (Abdulazim)
 import { DoctorList } from '@/features/doctors/components/DoctorList';
 import { DoctorProfile } from '@/features/doctors/components/DoctorProfile';
+import { DoctorProfileEdit } from '@/features/doctors/components/DoctorProfileEdit';
 import { BookingForm } from '@/features/appointments/components/BookingForm';
 
 // Appointments (Gerges)
@@ -55,6 +56,7 @@ export default function App() {
               <Route element={<PrivateRoute allowedRoles={['DOCTOR']} />}>
                 <Route path="/doctor/schedule" element={<ScheduleManagement />} />
                 <Route path="/doctor/appointments" element={<DoctorAppointmentDashboard />} />
+                <Route path="/doctor/profile" element={<DoctorProfileEdit />} />
               </Route>
 
               {/* Admin Routes */}
