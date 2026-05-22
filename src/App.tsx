@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { PrivateRoute } from '@/components/PrivateRoute';
+import { PublicOnlyRoute } from '@/components/PublicOnlyRoute';
 import { Unauthorized } from '@/components/Unauthorized';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/context/AuthContext';
@@ -35,9 +36,11 @@ export default function App() {
         <BrowserRouter>
           <Layout>
             <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<LoginForm />} />
-              <Route path="/register" element={<RegisterForm />} />
+              {/* Public Routes (redirect if already logged in) */}
+              <Route element={<PublicOnlyRoute />}>
+                <Route path="/login" element={<LoginForm />} />
+                <Route path="/register" element={<RegisterForm />} />
+              </Route>
               <Route path="/403" element={<Unauthorized />} />
 
               {/* Patient Routes */}
