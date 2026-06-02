@@ -106,24 +106,19 @@ export const AppointmentOverview: FC = () => {
   const [personFilter, setPersonFilter] = useState<PersonFilter>('ALL');
   const [search, setSearch] = useState('');
 
-  // Status filter goes to backend — reduces payload size
-  const {
-    data: appointments,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useAdminAppointments({
-    status: statusFilter === 'ALL' ? undefined : statusFilter,
-  });
+  // ── جيب كل الـ appointments مرة واحدة بدون فلترة من الـ backend ──
+  const { data: appointments, isLoading, isError, error, refetch } = useAdminAppointments();
 
-  // Doctor/Patient search is client-side — backend has no endpoint for it
+  // ── كل الفلترة client-side على نفس الداتا ──
   const filtered = useMemo(() => {
     if (!appointments) return [];
 
     return appointments.filter((appt) => {
-      const query = search.toLowerCase();
+      // Status filter
+      if (statusFilter !== 'ALL' && appt.status !== statusFilter) return false;
 
+      // Search filter
+      const query = search.toLowerCase();
       if (!query) return true;
 
       if (personFilter === 'DOCTOR') {
@@ -138,7 +133,7 @@ export const AppointmentOverview: FC = () => {
         appt.patient.name.toLowerCase().includes(query)
       );
     });
-  }, [appointments, search, personFilter]);
+  }, [appointments, search, personFilter, statusFilter]);
 
   if (isLoading) return <LoadingSpinner />;
   if (isError)
