@@ -1,13 +1,20 @@
-import { login as mockLogin, register as mockRegister } from '@/lib/mockApi';
+import { api } from '@/lib/api';
+import type { LoginRequest, RegisterRequest } from '@/types/global';
 
 export const useLogin = () => {
   return {
-    mutate: mockLogin,
+    mutate: async (credentials: LoginRequest) => {
+      const { data } = await api.post('/token/', credentials);
+      return data;
+    },
   };
 };
 
 export const useRegister = () => {
   return {
-    mutate: mockRegister,
+    mutate: async (request: RegisterRequest) => {
+      const { data } = await api.post('/register/', request);
+      return data;
+    },
   };
 };

@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import { User, RegisterRequest } from '@/types/global';
-import { login as mockLogin, register as mockRegister } from '@/lib/mockApi';
+import { api } from '@/lib/api';
 import { queryClient } from '@/lib/queryClient';
 
 interface AuthContextType {
@@ -26,7 +26,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const { user: loggedInUser, access, refresh } = await mockLogin({ email, password });
+      const { data } = await api.post('/token/', { email, password });
+      const { user: loggedInUser, access, refresh } = data;
       localStorage.setItem('user', JSON.stringify(loggedInUser));
       localStorage.setItem('access', access);
       localStorage.setItem('refresh', refresh);
@@ -39,7 +40,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = useCallback(async (request: RegisterRequest) => {
     setIsLoading(true);
     try {
-      const { user: newUser, access, refresh } = await mockRegister(request);
+      const { data } = await api.post('/register/', request);
+      const { user: newUser, access, refresh } = data;
       localStorage.setItem('user', JSON.stringify(newUser));
       localStorage.setItem('access', access);
       localStorage.setItem('refresh', refresh);
