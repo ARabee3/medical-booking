@@ -15,11 +15,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAdminAppointments } from '@/features/admin/api/adminApi';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { ErrorMessage } from '@/components/ErrorMessage';
-import type { Appointment } from '@/types/global';
+import type { AdminAppointment } from '@/features/admin/types';
+import type { AppointmentStatus } from '@/types/global';
 
 // ─── Status Badge ─────────────────────────────────────────────
 
-const StatusBadge: FC<{ status: Appointment['status'] }> = ({ status }) => {
+const StatusBadge: FC<{ status: AppointmentStatus }> = ({ status }) => {
   switch (status) {
     case 'COMPLETED':
       return (
@@ -40,13 +41,14 @@ const StatusBadge: FC<{ status: Appointment['status'] }> = ({ status }) => {
   }
 };
 
-// ─── Table UI (reusable internally) ──────────────────────────
+// ─── Table UI ─────────────────────────────────────────────────
 
-const AppointmentTable: FC<{ appointments: Appointment[] }> = ({ appointments }) => (
+const AppointmentTable: FC<{ appointments: AdminAppointment[] }> = ({ appointments }) => (
   <div className="overflow-x-auto">
     <Table>
       <TableHeader>
         <TableRow className="bg-muted/50">
+          <TableHead className="font-semibold text-foreground">Patient</TableHead>
           <TableHead className="font-semibold text-foreground">Doctor</TableHead>
           <TableHead className="font-semibold text-foreground">Specialty</TableHead>
           <TableHead className="font-semibold text-foreground">Date & Time</TableHead>
@@ -57,8 +59,13 @@ const AppointmentTable: FC<{ appointments: Appointment[] }> = ({ appointments })
       <TableBody>
         {appointments.map((appointment) => (
           <TableRow key={appointment.id} className="hover:bg-muted/30">
+            <TableCell className="font-medium text-foreground">
+              {appointment.patient.name}
+            </TableCell>
             <TableCell className="font-medium text-foreground">{appointment.doctor.name}</TableCell>
-            <TableCell className="text-muted-foreground">{appointment.doctor.specialty}</TableCell>
+            <TableCell className="text-muted-foreground">
+              {appointment.doctor.specialty ?? '—'}
+            </TableCell>
             <TableCell className="text-muted-foreground">
               <span className="block">
                 {format(parseISO(appointment.date), 'EEE, MMM d, yyyy')}
@@ -100,7 +107,7 @@ const AppointmentTable: FC<{ appointments: Appointment[] }> = ({ appointments })
   </div>
 );
 
-// ─── Main Export: works both as standalone page & embedded ────
+// ─── Main Export ──────────────────────────────────────────────
 
 export const AppointmentOverview: FC = () => {
   const { data: appointments, isLoading, isError, error, refetch } = useAdminAppointments();

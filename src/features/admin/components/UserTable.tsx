@@ -1,4 +1,4 @@
-import { FC, useState, useMemo } from 'react';
+import { FC, useState } from 'react';
 import { toast } from 'sonner';
 import { Search, ShieldCheck, ShieldOff, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -55,25 +55,25 @@ const StatusBadge: FC<{ isActive: boolean }> = ({ isActive }) => {
 // ─── Main Component ───────────────────────────────────────────
 
 export const UserTable: FC = () => {
-  const { data: users, isLoading, isError, error, refetch } = useAdminUsers();
-  const { mutate: updateUser, isPending } = useUpdateAdminUser();
-
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('ALL');
   const [page, setPage] = useState(1);
 
+  const {
+    data: users,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useAdminUsers({
+    search,
+    role: roleFilter === 'ALL' ? undefined : roleFilter,
+  });
+
+  const { mutate: updateUser, isPending } = useUpdateAdminUser();
+
   // ── Filter + Search ──
-  const filtered = useMemo(() => {
-    if (!users) return [];
-    return users.filter((user) => {
-      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
-      const matchesSearch =
-        fullName.includes(search.toLowerCase()) ||
-        user.email.toLowerCase().includes(search.toLowerCase());
-      const matchesRole = roleFilter === 'ALL' || user.role === roleFilter;
-      return matchesSearch && matchesRole;
-    });
-  }, [users, search, roleFilter]);
+  const filtered = users ?? [];
 
   // ── Pagination ──
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));

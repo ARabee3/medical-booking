@@ -18,22 +18,22 @@ export const StatCards: FC<StatCardsProps> = ({ stats }) => {
   const cards: StatCardItem[] = [
     {
       title: 'Total Users',
-      value: stats.totalUsers,
+      value: stats.total_users,
       icon: Users,
     },
     {
       title: 'Total Doctors',
-      value: stats.totalDoctors,
+      value: stats.total_doctors,
       icon: Stethoscope,
     },
     {
       title: 'Total Appointments',
-      value: stats.totalAppointments,
+      value: stats.total_appointments,
       icon: CalendarDays,
     },
     {
       title: 'Pending Approvals',
-      value: stats.pendingApprovals,
+      value: stats.pending_approvals,
       icon: ClockAlert,
       warnWhenPositive: true,
     },
@@ -65,7 +65,7 @@ export const StatCards: FC<StatCardsProps> = ({ stats }) => {
               <p
                 className={`text-3xl font-bold ${isWarning ? 'text-amber-700' : 'text-foreground'}`}
               >
-                {value.toLocaleString()}
+                {value?.toLocaleString() ?? 0}
               </p>
             </CardContent>
           </Card>
