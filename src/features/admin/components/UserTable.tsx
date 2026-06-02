@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { Search, ShieldCheck, ShieldOff, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -59,27 +59,32 @@ export const UserTable: FC = () => {
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('ALL');
   const [page, setPage] = useState(1);
 
-  const {
-    data: users,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useAdminUsers({
-    search,
-    role: roleFilter === 'ALL' ? undefined : roleFilter,
-  });
+  // ── جيب كل الـ users مرة واحدة بدون فلترة من الـ backend ──
+  const { data: users, isLoading, isError, error, refetch } = useAdminUsers();
 
   const { mutate: updateUser, isPending } = useUpdateAdminUser();
 
-  // ── Filter + Search ──
-  const filtered = users ?? [];
+  // ── Filter + Search client-side ──
+  const filtered = useMemo(() => {
+    if (!users) return [];
+
+    return users.filter((user) => {
+      // Role filter
+      if (roleFilter !== 'ALL' && user.role !== roleFilter) return false;
+
+      // Search filter
+      const query = search.toLowerCase();
+      if (!query) return true;
+
+      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+      return fullName.includes(query) || user.email.toLowerCase().includes(query);
+    });
+  }, [users, search, roleFilter]);
 
   // ── Pagination ──
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  // Reset to page 1 on filter/search change
   const handleSearch = (value: string) => {
     setSearch(value);
     setPage(1);
@@ -133,7 +138,7 @@ export const UserTable: FC = () => {
       <CardContent className="space-y-4">
         {/* ── Toolbar: Search + Role Filter ── */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
+          <div className="relative min-w-[250px] flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by name or email..."

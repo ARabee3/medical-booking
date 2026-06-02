@@ -26,7 +26,7 @@ import { DoctorAppointmentDashboard } from '@/features/appointments/components/D
 import { AdminDashboard } from '@/features/admin/components/AdminDashboard';
 import { UserTable } from './features/admin/components/UserTable';
 import { AppointmentOverview } from '@/features/admin/components/AppointmentOverview';
-
+import { SpecialtyManagement } from '@/features/admin/components/specialties/Specialtymanagement';
 // Doctor Tools (Mokhtar)
 import { ScheduleManagement } from '@/features/doctors/components/ScheduleManagement';
 
@@ -64,6 +64,7 @@ export default function App() {
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/users" element={<UserTable />} />
                 <Route path="/admin/appointments" element={<AppointmentOverview />} />
+                <Route path="/admin/specialties" element={<SpecialtyManagement />} />
               </Route>
 
               {/* Default */}

@@ -37,3 +37,18 @@ export interface AdminAppointment {
 export interface AdminUser extends User {
   date_joined: string;
 }
+
+// Specialty CRUD
+export interface Specialty {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  doctors_count: number;
+}
+
+export interface SpecialtyPayload {
+  name: string;
+  description?: string;
+  icon?: string;
+}
