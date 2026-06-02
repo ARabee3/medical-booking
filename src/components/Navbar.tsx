@@ -42,6 +42,7 @@ export const Navbar = () => {
           { label: 'Dashboard', path: '/admin/dashboard' },
           { label: 'Users', path: '/admin/users' },
           { label: 'All Appointments', path: '/admin/appointments' },
+          { label: 'Specialties', path: '/admin/specialties' },
         ];
       default:
         return [];

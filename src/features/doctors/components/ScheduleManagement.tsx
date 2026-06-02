@@ -7,11 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useDoctorSlots, useAddSlot, useDeleteSlot } from '@/features/doctors/api/doctorsApi';
+import {
+  useDoctorSlots,
+  useAddSlot,
+  useDeleteSlot,
+  useCurrentDoctor,
+} from '@/features/doctors/api/doctorsApi';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import type { AvailabilitySlot } from '@/types/global';
-
-// ─── Constants ────────────────────────────────────────────────
-const DOCTOR_ID = 2;
 
 // ─── Helpers ──────────────────────────────────────────────────
 
@@ -28,7 +31,6 @@ const hasOverlap = (
 ): boolean => {
   const newStart = toMinutes(start);
   const newEnd = toMinutes(end);
-
   return slots
     .filter((s) => s.date === date)
     .some((s) => {
@@ -60,11 +62,21 @@ export const ScheduleManagement: FC = () => {
   const [endTime, setEndTime] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
 
-  // ── Hooks ──
-  const { data: slots = [], isLoading, isError, refetch } = useDoctorSlots(DOCTOR_ID);
+  // ── Resolve current doctor from auth context ──
+  const { data: currentDoctor, isLoading: isDoctorLoading } = useCurrentDoctor();
+  const doctorId = currentDoctor?.id;
 
+  // ── Slots hooks — disabled until doctorId is resolved ──
+  const {
+    data: slots = [],
+    isLoading: isSlotsLoading,
+    isError,
+    refetch,
+  } = useDoctorSlots(doctorId ?? 0);
   const { mutate: addSlot, isPending: isAdding } = useAddSlot();
-  const { mutate: deleteSlot, isPending: isDeleting } = useDeleteSlot(DOCTOR_ID);
+  const { mutate: deleteSlot, isPending: isDeleting } = useDeleteSlot(doctorId ?? 0);
+
+  const isLoading = isDoctorLoading || isSlotsLoading;
 
   // ── Submit Handler ──
   const handleSubmit = () => {
@@ -98,14 +110,9 @@ export const ScheduleManagement: FC = () => {
       return;
     }
 
+    // doctor_id and is_booked are excluded — backend assigns them automatically
     addSlot(
-      {
-        doctor_id: DOCTOR_ID,
-        date,
-        start_time: startTime,
-        end_time: endTime,
-        is_booked: false,
-      },
+      { date, start_time: startTime, end_time: endTime },
       {
         onSuccess: () => {
           toast.success('Slot added successfully');
@@ -114,8 +121,8 @@ export const ScheduleManagement: FC = () => {
           setEndTime('');
           setFormError(null);
         },
-        onError: (err: Error) => {
-          toast.error(err.message || 'Failed to add slot. Please try again.');
+        onError: () => {
+          toast.error('Failed to add slot. Please try again.');
         },
       }
     );
@@ -124,8 +131,7 @@ export const ScheduleManagement: FC = () => {
   const handleDelete = (slot: AvailabilitySlot) => {
     deleteSlot(slot.id, {
       onSuccess: () => toast.success('Slot removed successfully'),
-      onError: (err: Error) =>
-        toast.error(err.message || 'Failed to remove slot. Please try again.'),
+      onError: () => toast.error('Failed to remove slot. Please try again.'),
     });
   };
 
@@ -145,6 +151,8 @@ export const ScheduleManagement: FC = () => {
 
   const dateGroups = Object.entries(groupedSlots);
   const todayStr = format(new Date(), 'yyyy-MM-dd');
+
+  if (isLoading) return <LoadingSpinner />;
 
   return (
     <div className="px-4 md:px-8 lg:px-12 py-8 space-y-8">
@@ -232,10 +240,6 @@ export const ScheduleManagement: FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading && (
-              <p className="text-sm text-muted-foreground text-center py-8">Loading slots...</p>
-            )}
-
             {isError && (
               <div className="text-center py-8">
                 <p className="text-sm text-destructive mb-2">Failed to load slots.</p>
@@ -245,13 +249,13 @@ export const ScheduleManagement: FC = () => {
               </div>
             )}
 
-            {!isLoading && !isError && dateGroups.length === 0 && (
+            {!isError && dateGroups.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-8">
                 No availability slots yet. Add your first slot using the form.
               </p>
             )}
 
-            {!isLoading && !isError && dateGroups.length > 0 && (
+            {!isError && dateGroups.length > 0 && (
               <div className="space-y-6">
                 {dateGroups.map(([groupDate, groupSlots]) => {
                   const parsedDate = parseISO(groupDate);
