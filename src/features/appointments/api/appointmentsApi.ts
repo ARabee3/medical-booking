@@ -1,12 +1,44 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  getAppointments,
-  bookAppointment,
-  updateAppointment,
-  getDoctorAppointments,
-  updateDoctorAppointment,
-} from '@/lib/mockApi';
+import { api } from '@/lib/api';
 import type { BookingRequest, Appointment, AppointmentStatus } from '@/types/global';
+
+// ==========================================
+// Real API functions (replacing mockApi)
+// These call the Django backend directly.
+// ==========================================
+
+const getAppointments = async (): Promise<Appointment[]> => {
+  const { data } = await api.get('/appointments/');
+  // Django StandardResultsSetPagination returns { count, results, ... }
+  return data.results ?? data;
+};
+
+const bookAppointment = async (request: BookingRequest): Promise<Appointment> => {
+  const { data } = await api.post('/appointments/', request);
+  return data;
+};
+
+const updateAppointment = async (
+  id: number,
+  updates: { status?: AppointmentStatus; date?: string; time?: string }
+): Promise<Appointment> => {
+  const { data } = await api.patch(`/appointments/${id}/`, updates);
+  return data;
+};
+
+const getDoctorAppointments = async (): Promise<Appointment[]> => {
+  const { data } = await api.get('/doctor/appointments/');
+  // Django StandardResultsSetPagination returns { count, results, ... }
+  return data.results ?? data;
+};
+
+const updateDoctorAppointment = async (
+  id: number,
+  updates: { status?: AppointmentStatus; notes?: string }
+): Promise<Appointment> => {
+  const { data } = await api.patch(`/doctor/appointments/${id}/`, updates);
+  return data;
+};
 
 export const useAppointments = () => {
   return useQuery({
