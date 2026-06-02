@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -36,6 +36,8 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 export const RegisterForm: FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const preselectedRole = searchParams.get('role') === 'DOCTOR' ? 'DOCTOR' : undefined;
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -45,7 +47,7 @@ export const RegisterForm: FC = () => {
       email: '',
       password: '',
       password_confirm: '',
-      role: undefined,
+      role: preselectedRole,
     },
   });
 

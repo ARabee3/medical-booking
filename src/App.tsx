@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { LandingPage } from '@/components/LandingPage';
 import { Layout } from '@/components/Layout';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import { PublicOnlyRoute } from '@/components/PublicOnlyRoute';
@@ -67,9 +68,9 @@ export default function App() {
                 <Route path="/admin/specialties" element={<SpecialtyManagement />} />
               </Route>
 
-              {/* Default */}
-              <Route path="/" element={<Navigate to="/login" replace />} />
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              {/* Landing */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Layout>
           <Toaster />
