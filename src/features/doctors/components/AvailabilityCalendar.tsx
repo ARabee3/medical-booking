@@ -69,9 +69,9 @@ export const AvailabilityCalendar: FC<AvailabilityCalendarProps> = ({
                 <p className="text-sm text-[var(--color-destructive)]">
                   Failed to load slots. Please try again.
                 </p>
-              ) : slots && slots.length > 0 ? (
+              ) : slots && slots.slots.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {slots.map((time) => {
+                  {slots.slots.map((time: string) => {
                     const isSelected =
                       selectedSlot?.date === formattedDate && selectedSlot?.time === time;
 
