@@ -10,9 +10,13 @@ type AddSlotPayload = Omit<AvailabilitySlot, 'id' | 'is_booked' | 'doctor_id'>;
 // API functions
 // ---------------------------------------------------------------------------
 
-const fetchDoctors = async (specialty?: string): Promise<Doctor[]> => {
+const fetchDoctors = async (specialty?: string, search?: string): Promise<Doctor[]> => {
+  const params: Record<string, string> = {};
+  if (specialty) params.specialty = specialty;
+  if (search) params.search = search;
+
   const { data } = await api.get('/doctors/', {
-    params: specialty ? { specialty } : undefined,
+    params: Object.keys(params).length ? params : undefined,
   });
   return data.results ?? data;
 };
@@ -62,10 +66,10 @@ const deleteAvailabilitySlot = async (id: number): Promise<void> => {
 // React Query hooks
 // ---------------------------------------------------------------------------
 
-export const useDoctors = (specialty?: string) => {
+export const useDoctors = (specialty?: string, search?: string) => {
   return useQuery({
-    queryKey: ['doctors', specialty],
-    queryFn: () => fetchDoctors(specialty),
+    queryKey: ['doctors', specialty, search],
+    queryFn: () => fetchDoctors(specialty, search),
   });
 };
 
