@@ -170,6 +170,8 @@ export const mockDoctors: Doctor[] = [
     bio: 'Board-certified cardiologist with 12 years of experience in interventional cardiology. Specializes in preventive cardiac care and minimally invasive procedures.',
     image_url: 'https://i.pravatar.cc/150?u=sarah',
     is_active: true,
+    average_rating: null,
+    review_count: 0,
   },
   {
     id: 2,
@@ -180,6 +182,8 @@ export const mockDoctors: Doctor[] = [
     bio: 'Expert dermatologist with 8 years of clinical practice. Focuses on skin cancer screening, acne treatment, and cosmetic dermatology.',
     image_url: 'https://i.pravatar.cc/150?u=mark',
     is_active: true,
+    average_rating: null,
+    review_count: 0,
   },
   {
     id: 3,
@@ -190,6 +194,8 @@ export const mockDoctors: Doctor[] = [
     bio: 'Neurologist specializing in movement disorders and neurodegenerative diseases. Research focus on early diagnosis of Parkinson disease.',
     image_url: 'https://i.pravatar.cc/150?u=emily',
     is_active: true,
+    average_rating: null,
+    review_count: 0,
   },
   {
     id: 4,
@@ -200,6 +206,8 @@ export const mockDoctors: Doctor[] = [
     bio: 'Compassionate pediatrician with 15 years of experience. Board-certified in pediatric emergency medicine and newborn care.',
     image_url: 'https://i.pravatar.cc/150?u=michael',
     is_active: true,
+    average_rating: null,
+    review_count: 0,
   },
   {
     id: 5,
@@ -210,6 +218,8 @@ export const mockDoctors: Doctor[] = [
     bio: 'Orthopedic surgeon specializing in sports medicine and joint replacement. Former team physician for professional athletes.',
     image_url: 'https://i.pravatar.cc/150?u=lisa',
     is_active: true,
+    average_rating: null,
+    review_count: 0,
   },
   {
     id: 6,
@@ -220,6 +230,8 @@ export const mockDoctors: Doctor[] = [
     bio: 'Family physician providing comprehensive primary care. Emphasizes preventive medicine and chronic disease management.',
     image_url: 'https://i.pravatar.cc/150?u=james',
     is_active: true,
+    average_rating: null,
+    review_count: 0,
   },
   {
     id: 7,
@@ -230,6 +242,8 @@ export const mockDoctors: Doctor[] = [
     bio: 'Interventional cardiologist with expertise in electrophysiology. Published researcher on arrhythmia management techniques.',
     image_url: 'https://i.pravatar.cc/150?u=aisha',
     is_active: true,
+    average_rating: null,
+    review_count: 0,
   },
   {
     id: 8,
@@ -240,6 +254,8 @@ export const mockDoctors: Doctor[] = [
     bio: 'Neurosurgeon with fellowship training in cerebrovascular surgery. Expert in treating brain aneurysms and stroke prevention.',
     image_url: 'https://i.pravatar.cc/150?u=robert',
     is_active: true,
+    average_rating: null,
+    review_count: 0,
   },
   {
     id: 9,
@@ -250,6 +266,8 @@ export const mockDoctors: Doctor[] = [
     bio: 'Dermatopathologist combining clinical and laboratory expertise. Specializes in inflammatory skin diseases and melanoma diagnosis.',
     image_url: 'https://i.pravatar.cc/150?u=maria',
     is_active: true,
+    average_rating: null,
+    review_count: 0,
   },
   {
     id: 10,
@@ -260,6 +278,8 @@ export const mockDoctors: Doctor[] = [
     bio: 'Spine surgeon with advanced training in minimally invasive techniques. Dedicated to improving quality of life for patients with back pain.',
     image_url: 'https://i.pravatar.cc/150?u=david',
     is_active: true,
+    average_rating: null,
+    review_count: 0,
   },
 ];
 

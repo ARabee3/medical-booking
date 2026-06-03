@@ -209,7 +209,7 @@ export const ImageUploader: FC<ImageUploaderProps> = ({ kind }) => {
           className="aspect-square rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors cursor-pointer disabled:opacity-50"
         >
           {uploadMutation.isPending ? (
-            <LoadingSpinner size="sm" />
+            <LoadingSpinner />
           ) : (
             <>
               <Upload className="h-8 w-8" />
