@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
+import { Avatar } from '@/components/ui/avatar';
 import { Menu, X, Stethoscope } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -80,10 +81,23 @@ export const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            {isAuthenticated && (
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                Logout
-              </Button>
+            {isAuthenticated && user && (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Avatar
+                    src={null}
+                    alt={`${user.first_name} ${user.last_name}`}
+                    fallback={`${user.first_name} ${user.last_name}`}
+                    className="h-7 w-7 text-xs"
+                  />
+                  <span className="text-sm font-medium text-[var(--color-foreground)]">
+                    {user.first_name} {user.last_name}
+                  </span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </div>
             )}
           </div>
 
@@ -114,15 +128,28 @@ export const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            {isAuthenticated && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
+            {isAuthenticated && user && (
+              <>
+                <div className="flex items-center gap-2 px-2 py-2 border-t border-[var(--color-border)]">
+                  <Avatar
+                    src={null}
+                    alt={`${user.first_name} ${user.last_name}`}
+                    fallback={`${user.first_name} ${user.last_name}`}
+                    className="h-7 w-7 text-xs"
+                  />
+                  <span className="text-sm font-medium text-[var(--color-foreground)]">
+                    {user.first_name} {user.last_name}
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </>
             )}
           </div>
         )}

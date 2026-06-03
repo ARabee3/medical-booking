@@ -1,8 +1,10 @@
 import { FC, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Award } from 'lucide-react';
+import { ArrowLeft, MapPin, Award, Building2, FileBadge, X, MessageSquare } from 'lucide-react';
 import { useDoctor } from '@/features/doctors/api/doctorsApi';
 import { AvailabilityCalendar } from '@/features/doctors/components/AvailabilityCalendar';
+import { ReviewList } from '@/features/reviews/components/ReviewList';
+import { StarRating } from '@/components/ui/star-rating';
 import { useBookAppointment } from '@/features/appointments/api/appointmentsApi';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +21,86 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { format, parseISO } from 'date-fns';
+import type { DoctorImageKind } from '@/types/global';
+
+const KIND_ICONS: Record<DoctorImageKind, typeof Building2> = {
+  CLINIC: Building2,
+  CERTIFICATE: FileBadge,
+};
+
+const KIND_LABELS: Record<DoctorImageKind, string> = {
+  CLINIC: 'Clinic Photos',
+  CERTIFICATE: 'Certificates',
+};
+
+interface ImageGalleryProps {
+  images: { id: number; image_url: string; caption?: string }[];
+  kind: DoctorImageKind;
+}
+
+const ImageGallery: FC<ImageGalleryProps> = ({ images, kind }) => {
+  const [selectedImage, setSelectedImage] = useState<{ url: string; caption: string } | null>(null);
+  const Icon = KIND_ICONS[kind];
+
+  if (images.length === 0) return null;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Icon className="h-5 w-5 text-[var(--color-foreground-muted)]" />
+        <h2 className="text-xl font-semibold text-[var(--color-foreground)]">
+          {KIND_LABELS[kind]}
+        </h2>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {images.map((img) => (
+          <button
+            key={img.id}
+            type="button"
+            onClick={() => setSelectedImage({ url: img.image_url, caption: img.caption || '' })}
+            className="group relative aspect-square rounded-lg overflow-hidden border hover:ring-2 hover:ring-primary transition-all"
+          >
+            <img
+              src={img.image_url}
+              alt={img.caption || KIND_LABELS[kind]}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            />
+            {img.caption && (
+              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent p-2 pt-6">
+                <p className="text-xs text-white truncate">{img.caption}</p>
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+
+      <Dialog open={!!selectedImage} onOpenChange={(open) => !open && setSelectedImage(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              {selectedImage?.caption || KIND_LABELS[kind]}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setSelectedImage(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          {selectedImage && (
+            <img
+              src={selectedImage.url}
+              alt={selectedImage.caption || KIND_LABELS[kind]}
+              className="w-full rounded-lg"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
 
 export const DoctorProfile: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,15 +110,19 @@ export const DoctorProfile: FC = () => {
   const { data: doctor, isLoading, isError, error, refetch } = useDoctor(doctorId);
   const bookMutation = useBookAppointment();
 
-  const [selectedSlot, setSelectedSlot] = useState<{ date: string; time: string } | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{
+    date: string;
+    time: string;
+    price?: string | null;
+  } | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleBack = () => {
     navigate('/doctors');
   };
 
-  const handleSlotSelect = (date: string, time: string) => {
-    setSelectedSlot({ date, time });
+  const handleSlotSelect = (date: string, time: string, price: string | null) => {
+    setSelectedSlot({ date, time, price });
   };
 
   const handleBookClick = () => {
@@ -145,6 +231,20 @@ export const DoctorProfile: FC = () => {
               {doctor.email}
             </span>
           </div>
+          {doctor.review_count > 0 && (
+            <div className="flex items-center gap-2 pt-1">
+              <StarRating
+                rating={doctor.average_rating || 0}
+                size="sm"
+                readonly
+                halfStars
+                showValue
+              />
+              <span className="text-sm text-muted-foreground">
+                ({doctor.review_count} {doctor.review_count === 1 ? 'review' : 'reviews'})
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -154,6 +254,28 @@ export const DoctorProfile: FC = () => {
         <p className="text-base text-[var(--color-foreground-muted)] leading-relaxed">
           {doctor.bio}
         </p>
+      </div>
+
+      {/* Clinic & Certificate Images */}
+      {doctor.images && doctor.images.length > 0 && (
+        <>
+          <div className="border-t border-[var(--color-border)]" />
+          <ImageGallery images={doctor.images.filter((i) => i.kind === 'CLINIC')} kind="CLINIC" />
+          <ImageGallery
+            images={doctor.images.filter((i) => i.kind === 'CERTIFICATE')}
+            kind="CERTIFICATE"
+          />
+        </>
+      )}
+
+      {/* Reviews Section */}
+      <div className="border-t border-[var(--color-border)]" />
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5 text-[var(--color-foreground-muted)]" />
+          <h2 className="text-xl font-semibold text-[var(--color-foreground)]">Reviews</h2>
+        </div>
+        <ReviewList doctorId={doctorId} />
       </div>
 
       {/* Divider */}
@@ -200,6 +322,12 @@ export const DoctorProfile: FC = () => {
               <span className="text-sm text-[var(--color-foreground-muted)]">Time</span>
               <span className="text-sm font-medium text-[var(--color-foreground)]">
                 {selectedSlot?.time}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm text-[var(--color-foreground-muted)]">Price</span>
+              <span className="text-sm font-medium text-emerald-700">
+                {selectedSlot?.price ? `$${Number(selectedSlot.price).toFixed(2)}` : 'Free'}
               </span>
             </div>
           </div>

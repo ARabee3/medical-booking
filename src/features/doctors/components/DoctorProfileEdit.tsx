@@ -1,12 +1,17 @@
-import { FC, useEffect } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { FC, useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'sonner';
-import { useCurrentDoctor, useUpdateDoctor } from '@/features/doctors/api/doctorsApi';
+import {
+  useCurrentDoctor,
+  useUpdateDoctorProfile,
+  useUploadAvatar,
+  useDeleteAvatar,
+} from '@/features/doctors/api/doctorsApi';
+import { ImageUploader } from './ImageUploader';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
@@ -18,7 +23,9 @@ import {
 } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorMessage } from '@/components/ErrorMessage';
-import { UserCircle } from 'lucide-react';
+import { UserCircle, Trash2, Camera, Building2, FileBadge, MessageSquare } from 'lucide-react';
+import { ReviewList } from '@/features/reviews/components/ReviewList';
+import { StarRating } from '@/components/ui/star-rating';
 
 const SPECIALTIES = [
   'Cardiology',
@@ -30,38 +37,36 @@ const SPECIALTIES = [
 ];
 
 const profileSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
   specialty: z.string().min(1, 'Specialty is required'),
   bio: z
     .string()
     .min(10, 'Bio must be at least 10 characters')
     .max(500, 'Bio must be under 500 characters'),
-  image_url: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 export const DoctorProfileEdit: FC = () => {
   const { data: doctor, isLoading, isError, error, refetch } = useCurrentDoctor();
-  const updateMutation = useUpdateDoctor();
+  const updateMutation = useUpdateDoctorProfile();
+  const uploadAvatarMutation = useUploadAvatar();
+  const deleteAvatarMutation = useDeleteAvatar();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: '',
       specialty: '',
       bio: '',
-      image_url: '',
     },
   });
 
   useEffect(() => {
     if (doctor) {
       form.reset({
-        name: doctor.name,
         specialty: doctor.specialty,
         bio: doctor.bio,
-        image_url: doctor.image_url || '',
       });
     }
   }, [doctor, form]);
@@ -73,10 +78,8 @@ export const DoctorProfileEdit: FC = () => {
       await updateMutation.mutateAsync({
         id: doctor.id,
         updates: {
-          name: values.name,
           specialty: values.specialty,
           bio: values.bio,
-          image_url: values.image_url || null,
         },
       });
       toast.success('Profile updated successfully');
@@ -85,11 +88,46 @@ export const DoctorProfileEdit: FC = () => {
     }
   };
 
-  const imageUrl = useWatch({ control: form.control, name: 'image_url' });
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+
+    uploadAvatarMutation.mutate(file, {
+      onSuccess: () => {
+        toast.success('Avatar updated');
+        URL.revokeObjectURL(objectUrl);
+        setPreviewUrl(null);
+      },
+      onError: () => {
+        toast.error('Failed to upload avatar');
+        URL.revokeObjectURL(objectUrl);
+        setPreviewUrl(null);
+      },
+    });
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDeleteAvatar = () => {
+    deleteAvatarMutation.mutate(undefined, {
+      onSuccess: () => toast.success('Avatar removed'),
+      onError: () => toast.error('Failed to remove avatar'),
+    });
+  };
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto space-y-8">
+      <div className="max-w-3xl mx-auto space-y-8">
         <div className="flex items-center gap-4">
           <Skeleton className="h-20 w-20 rounded-full" />
           <div className="space-y-2">
@@ -125,47 +163,66 @@ export const DoctorProfileEdit: FC = () => {
     );
   }
 
+  const avatarSrc = previewUrl || doctor.image_url || null;
+
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="max-w-3xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-[var(--color-foreground)]">My Profile</h1>
         <p className="text-[var(--color-foreground-muted)] mt-1">
-          Update your public profile information.
+          Update your public profile information and manage your images.
         </p>
       </div>
 
-      {/* Avatar Preview */}
-      <div className="flex items-center gap-4">
-        <Avatar
-          src={imageUrl || null}
-          alt={doctor.name}
-          fallback={doctor.name}
-          className="h-20 w-20 text-2xl"
-        />
-        <div>
-          <p className="text-sm font-medium text-[var(--color-foreground)]">Profile Photo</p>
-          <p className="text-xs text-[var(--color-foreground-muted)]">
-            Paste an image URL below to update your avatar.
+      {/* Avatar Section */}
+      <div className="flex items-center gap-6">
+        <div className="relative group">
+          <Avatar
+            src={avatarSrc}
+            alt={doctor.name}
+            fallback={doctor.name}
+            className="h-24 w-24 text-3xl"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 rounded-full transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer">
+            <Camera className="h-6 w-6 text-white" />
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarUpload}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute inset-0"
+            disabled={uploadAvatarMutation.isPending}
+          />
+        </div>
+        <div className="flex-1">
+          <p className="text-sm font-medium text-[var(--color-foreground)]">{doctor.name}</p>
+          <p className="text-xs text-[var(--color-foreground-muted)] mt-1">
+            Click the avatar to upload a new photo.
           </p>
+          {doctor.image_url && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs text-destructive mt-2 p-0"
+              onClick={handleDeleteAvatar}
+              disabled={deleteAvatarMutation.isPending}
+            >
+              <Trash2 className="h-3 w-3 mr-1" />
+              Remove avatar
+            </Button>
+          )}
         </div>
       </div>
 
+      {/* Profile Form */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Dr. Sarah Chen" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <FormField
             control={form.control}
             name="specialty"
@@ -207,20 +264,6 @@ export const DoctorProfileEdit: FC = () => {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="image_url"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Avatar URL</FormLabel>
-                <FormControl>
-                  <Input placeholder="https://example.com/photo.jpg" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <div className="flex items-center gap-4 pt-2">
             <Button
               type="submit"
@@ -235,10 +278,8 @@ export const DoctorProfileEdit: FC = () => {
                 variant="outline"
                 onClick={() =>
                   form.reset({
-                    name: doctor.name,
                     specialty: doctor.specialty,
                     bio: doctor.bio,
-                    image_url: doctor.image_url || '',
                   })
                 }
               >
@@ -248,6 +289,66 @@ export const DoctorProfileEdit: FC = () => {
           </div>
         </form>
       </Form>
+
+      {/* Divider */}
+      <div className="border-t border-[var(--color-border)]" />
+
+      {/* Clinic Images Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Building2 className="h-5 w-5 text-[var(--color-foreground-muted)]" />
+          <h2 className="text-xl font-semibold text-[var(--color-foreground)]">Clinic Images</h2>
+        </div>
+        <p className="text-sm text-[var(--color-foreground-muted)]">
+          Show patients your clinic facilities and waiting areas.
+        </p>
+        <ImageUploader kind="CLINIC" />
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-[var(--color-border)]" />
+
+      {/* Certificates Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <FileBadge className="h-5 w-5 text-[var(--color-foreground-muted)]" />
+          <h2 className="text-xl font-semibold text-[var(--color-foreground)]">Certificates</h2>
+        </div>
+        <p className="text-sm text-[var(--color-foreground-muted)]">
+          Upload your medical licenses, board certifications, and qualifications.
+        </p>
+        <ImageUploader kind="CERTIFICATE" />
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-[var(--color-border)]" />
+
+      {/* Reviews Section */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5 text-[var(--color-foreground-muted)]" />
+          <h2 className="text-xl font-semibold text-[var(--color-foreground)]">Patient Reviews</h2>
+        </div>
+        {doctor.review_count > 0 ? (
+          <div className="flex items-center gap-2">
+            <StarRating
+              rating={doctor.average_rating || 0}
+              size="sm"
+              readonly
+              halfStars
+              showValue
+            />
+            <span className="text-sm text-muted-foreground">
+              ({doctor.review_count} {doctor.review_count === 1 ? 'review' : 'reviews'})
+            </span>
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--color-foreground-muted)]">
+            No reviews yet. Reviews will appear here after patients complete appointments with you.
+          </p>
+        )}
+        <ReviewList doctorId={doctor.id} />
+      </div>
     </div>
   );
 };

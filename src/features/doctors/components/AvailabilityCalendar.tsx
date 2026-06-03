@@ -1,16 +1,18 @@
 import { FC, useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, isBefore, startOfDay } from 'date-fns';
 import { useDoctorAvailability, useAvailabilitySummary } from '@/features/doctors/api/doctorsApi';
+import type { DoctorAvailabilitySlot } from '@/features/doctors/api/doctorsApi';
 import { Calendar } from '@/components/ui/calendar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Clock, CalendarX, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AvailabilityCalendarProps {
   doctorId: number;
-  onSlotSelect?: (date: string, time: string) => void;
-  selectedSlot?: { date: string; time: string } | null;
+  onSlotSelect?: (date: string, time: string, price: string | null) => void;
+  selectedSlot?: { date: string; time: string; price?: string | null } | null;
   onBook?: (date: string, time: string) => void;
 }
 
@@ -141,7 +143,8 @@ export const AvailabilityCalendar: FC<AvailabilityCalendarProps> = ({
                 </p>
               ) : slots && slots.slots.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {slots.slots.map((time: string) => {
+                  {slots.slots.map((slot: DoctorAvailabilitySlot) => {
+                    const { time, price } = slot;
                     const isSelected =
                       selectedSlot?.date === formattedDate && selectedSlot?.time === time;
 
@@ -151,18 +154,37 @@ export const AvailabilityCalendar: FC<AvailabilityCalendarProps> = ({
                         variant={isSelected ? 'default' : 'outline'}
                         size="sm"
                         className={cn(
-                          'justify-center',
+                          'justify-center h-auto py-2',
                           isSelected &&
                             'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-light)]'
                         )}
                         onClick={() => {
                           if (onSlotSelect) {
-                            onSlotSelect(formattedDate, time);
+                            onSlotSelect(formattedDate, time, price);
                           }
                         }}
                       >
-                        <Clock className="h-3.5 w-3.5 mr-1.5" />
-                        {time}
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5" />
+                            {time}
+                          </span>
+                          {price ? (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] px-1 py-0 h-4 border-emerald-300 text-emerald-700 bg-emerald-50"
+                            >
+                              ${Number(price).toFixed(2)}
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] px-1 py-0 h-4 text-muted-foreground"
+                            >
+                              Free
+                            </Badge>
+                          )}
+                        </div>
                       </Button>
                     );
                   })}
