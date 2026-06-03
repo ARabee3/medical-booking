@@ -23,9 +23,18 @@ import {
 } from '@/components/ui/form';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorMessage } from '@/components/ErrorMessage';
-import { UserCircle, Trash2, Camera, Building2, FileBadge, MessageSquare } from 'lucide-react';
+import {
+  UserCircle,
+  Trash2,
+  Camera,
+  Building2,
+  FileBadge,
+  MessageSquare,
+  Clock,
+} from 'lucide-react';
 import { ReviewList } from '@/features/reviews/components/ReviewList';
 import { StarRating } from '@/components/ui/star-rating';
+import { useAuth } from '@/context/AuthContext';
 
 const SPECIALTIES = [
   'Cardiology',
@@ -125,6 +134,8 @@ export const DoctorProfileEdit: FC = () => {
     });
   };
 
+  const { user } = useAuth();
+
   if (isLoading) {
     return (
       <div className="max-w-3xl mx-auto space-y-8">
@@ -140,6 +151,21 @@ export const DoctorProfileEdit: FC = () => {
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-32 w-full" />
         </div>
+      </div>
+    );
+  }
+
+  if (user?.role === 'DOCTOR' && !user.is_approved) {
+    return (
+      <div className="py-12 text-center">
+        <Clock className="h-12 w-12 text-[var(--color-foreground-muted)] mx-auto mb-4" />
+        <h2 className="text-xl font-semibold text-[var(--color-foreground)] mb-2">
+          Profile Pending Approval
+        </h2>
+        <p className="text-base text-[var(--color-foreground-muted)] max-w-md mx-auto">
+          Your profile is currently under review. The admin will approve your profile as soon as
+          possible.
+        </p>
       </div>
     );
   }
