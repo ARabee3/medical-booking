@@ -170,6 +170,28 @@ export const DoctorProfileEdit: FC = () => {
     );
   }
 
+  // Detect the "no doctor profile" 404 from the backend
+  const isNoProfileError =
+    isError &&
+    ((error as { response?: { status: number; data?: { detail?: string } } })?.response?.status ===
+      404 ||
+      error?.message?.toLowerCase().includes('doctor profile'));
+
+  if (isNoProfileError) {
+    return (
+      <div className="py-12 text-center">
+        <UserCircle className="h-12 w-12 text-[var(--color-foreground-muted)] mx-auto mb-4" />
+        <h2 className="text-xl font-semibold text-[var(--color-foreground)] mb-2">
+          Doctor Profile Not Found
+        </h2>
+        <p className="text-base text-[var(--color-foreground-muted)] max-w-md mx-auto">
+          It looks like your doctor profile hasn't been set up yet. Please contact the administrator
+          for assistance.
+        </p>
+      </div>
+    );
+  }
+
   if (isError) {
     return (
       <div className="py-12">
