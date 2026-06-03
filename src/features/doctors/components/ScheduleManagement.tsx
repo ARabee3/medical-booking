@@ -22,6 +22,7 @@ import {
   useCurrentDoctor,
 } from '@/features/doctors/api/doctorsApi';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { useAuth } from '@/context/AuthContext';
 import type { AvailabilitySlot } from '@/types/global';
 
 // ─── Helpers ──────────────────────────────────────────────────
@@ -87,6 +88,7 @@ export const ScheduleManagement: FC = () => {
   const { mutate: deleteSlot, isPending: isDeleting } = useDeleteSlot(doctorId ?? 0);
 
   const isLoading = isDoctorLoading || isSlotsLoading;
+  const { user } = useAuth();
 
   // ── Submit Handler ──
   const handleSubmit = () => {
@@ -178,6 +180,21 @@ export const ScheduleManagement: FC = () => {
   const todayStr = format(new Date(), 'yyyy-MM-dd');
 
   if (isLoading) return <LoadingSpinner />;
+
+  if (user?.role === 'DOCTOR' && !user.is_approved) {
+    return (
+      <div className="py-12 text-center">
+        <Clock className="h-12 w-12 text-[var(--color-foreground-muted)] mx-auto mb-4" />
+        <h2 className="text-xl font-semibold text-[var(--color-foreground)] mb-2">
+          Profile Pending Approval
+        </h2>
+        <p className="text-base text-[var(--color-foreground-muted)] max-w-md mx-auto">
+          Your profile is currently under review. The admin will approve your profile as soon as
+          possible.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 md:px-8 lg:px-12 py-8 space-y-8">
