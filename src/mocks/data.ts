@@ -327,6 +327,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-20',
     start_time: '09:00',
     end_time: '10:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -335,6 +336,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-20',
     start_time: '10:30',
     end_time: '11:30',
+    price: null,
     is_booked: false,
   },
   {
@@ -343,6 +345,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-20',
     start_time: '14:00',
     end_time: '15:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -351,6 +354,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-21',
     start_time: '09:00',
     end_time: '10:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -359,6 +363,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-21',
     start_time: '11:00',
     end_time: '12:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -367,6 +372,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-22',
     start_time: '09:00',
     end_time: '10:00',
+    price: null,
     is_booked: true,
   },
   {
@@ -375,6 +381,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-22',
     start_time: '10:30',
     end_time: '11:30',
+    price: null,
     is_booked: false,
   },
   {
@@ -383,6 +390,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-22',
     start_time: '14:00',
     end_time: '15:00',
+    price: null,
     is_booked: true,
   },
   {
@@ -391,6 +399,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-23',
     start_time: '09:00',
     end_time: '10:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -399,6 +408,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-23',
     start_time: '15:00',
     end_time: '16:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -407,6 +417,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-24',
     start_time: '10:00',
     end_time: '11:00',
+    price: null,
     is_booked: false,
   },
 
@@ -417,6 +428,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-20',
     start_time: '09:00',
     end_time: '10:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -425,6 +437,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-20',
     start_time: '11:00',
     end_time: '12:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -433,6 +446,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-21',
     start_time: '14:00',
     end_time: '15:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -441,6 +455,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-22',
     start_time: '09:00',
     end_time: '10:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -449,6 +464,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-23',
     start_time: '10:00',
     end_time: '11:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -457,6 +473,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-24',
     start_time: '14:00',
     end_time: '15:00',
+    price: null,
     is_booked: true,
   },
 
@@ -467,6 +484,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-20',
     start_time: '10:00',
     end_time: '11:00',
+    price: null,
     is_booked: true,
   },
   {
@@ -475,6 +493,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-21',
     start_time: '09:00',
     end_time: '10:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -483,6 +502,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-21',
     start_time: '11:00',
     end_time: '12:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -491,6 +511,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-22',
     start_time: '14:00',
     end_time: '15:00',
+    price: null,
     is_booked: false,
   },
   {
@@ -499,6 +520,7 @@ export const mockAvailability: AvailabilitySlot[] = [
     date: '2026-01-23',
     start_time: '09:00',
     end_time: '10:00',
+    price: null,
     is_booked: false,
   },
 ];
