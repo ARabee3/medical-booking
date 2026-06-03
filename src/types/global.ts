@@ -13,6 +13,19 @@ export interface User {
 
 export type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED';
 
+export type DoctorImageKind = 'CLINIC' | 'CERTIFICATE';
+
+export interface DoctorImage {
+  id: number;
+  doctor_id: number;
+  image_url: string;
+  public_id: string;
+  kind: DoctorImageKind;
+  caption: string;
+  order: number;
+  created_at: string;
+}
+
 export interface Doctor {
   id: number;
   user_id: number;
@@ -22,6 +35,20 @@ export interface Doctor {
   bio: string;
   image_url: string | null;
   is_active: boolean;
+  average_rating: number | null;
+  review_count: number;
+  images?: DoctorImage[];
+}
+
+export interface Review {
+  id: number;
+  appointment: number;
+  patient_name: string;
+  doctor_name: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Patient {
@@ -48,6 +75,7 @@ export interface AvailabilitySlot {
   date: string;
   start_time: string;
   end_time: string;
+  price: number | null;
   is_booked: boolean;
 }
 

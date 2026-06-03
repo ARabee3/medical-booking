@@ -19,14 +19,24 @@ export type CalendarProps = {
   mode?: 'single';
   selected?: Date;
   onSelect?: (date: Date) => void;
+  onMonthChange?: (date: Date) => void;
   disabled?: (date: Date) => boolean;
   modifiers?: {
     available?: Date[];
   };
+  slotCounts?: Record<string, number>;
   className?: string;
 };
 
-function Calendar({ selected, onSelect, disabled, modifiers, className }: CalendarProps) {
+function Calendar({
+  selected,
+  onSelect,
+  onMonthChange,
+  disabled,
+  modifiers,
+  slotCounts,
+  className,
+}: CalendarProps) {
   const [currentMonth, setCurrentMonth] = React.useState(selected || new Date());
 
   const monthStart = startOfMonth(currentMonth);
@@ -47,11 +57,15 @@ function Calendar({ selected, onSelect, disabled, modifiers, className }: Calend
   }, [modifiers?.available]);
 
   const handlePrevMonth = () => {
-    setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    const next = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+    setCurrentMonth(next);
+    onMonthChange?.(next);
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    const next = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+    setCurrentMonth(next);
+    onMonthChange?.(next);
   };
 
   const weekDays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
@@ -90,6 +104,8 @@ function Calendar({ selected, onSelect, disabled, modifiers, className }: Calend
           const isDisabled = isPast || (disabled && disabled(date));
           const isAvailable = availableSet.has(format(date, 'yyyy-MM-dd'));
 
+          const slotCount = slotCounts?.[format(date, 'yyyy-MM-dd')] || 0;
+
           return (
             <button
               key={idx}
@@ -102,7 +118,7 @@ function Calendar({ selected, onSelect, disabled, modifiers, className }: Calend
                 }
               }}
               className={cn(
-                'h-9 w-full rounded-md text-sm relative flex items-center justify-center transition-colors',
+                'h-10 w-full rounded-md text-sm relative flex flex-col items-center justify-center transition-colors',
                 'hover:bg-[var(--color-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]',
                 !isCurrentMonth && 'text-[var(--color-foreground-muted)] opacity-50',
                 isSelected &&
@@ -112,12 +128,14 @@ function Calendar({ selected, onSelect, disabled, modifiers, className }: Calend
                 isAvailable &&
                   !isSelected &&
                   !isDisabled &&
-                  'border border-[var(--color-primary)] text-[var(--color-primary)] font-medium'
+                  'bg-[var(--color-primary-lighter)] text-[var(--color-primary)] font-medium border border-[var(--color-primary-light)]'
               )}
             >
-              {format(date, 'd')}
-              {isAvailable && !isSelected && !isDisabled && (
-                <span className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[var(--color-primary)]" />
+              <span>{format(date, 'd')}</span>
+              {slotCount > 0 && !isSelected && !isDisabled && (
+                <span className="text-[10px] leading-none font-semibold text-[var(--color-primary)]">
+                  {slotCount} slots
+                </span>
               )}
             </button>
           );

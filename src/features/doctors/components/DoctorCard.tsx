@@ -5,6 +5,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { StarRating } from '@/components/ui/star-rating';
 
 interface DoctorCardProps {
   doctor: Doctor;
@@ -39,6 +40,17 @@ export const DoctorCard: FC<DoctorCardProps> = ({ doctor }) => {
           >
             {doctor.specialty}
           </Badge>
+          {doctor.review_count > 0 && (
+            <div className="mt-1">
+              <StarRating
+                rating={doctor.average_rating || 0}
+                size="sm"
+                readonly
+                halfStars
+                showValue
+              />
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent className="flex flex-col flex-1">

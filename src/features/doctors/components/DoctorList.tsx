@@ -1,4 +1,4 @@
-import { FC, useState, useMemo } from 'react';
+import { FC, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, X, SlidersHorizontal } from 'lucide-react';
 import { useDoctors } from '@/features/doctors/api/doctorsApi';
@@ -24,20 +24,13 @@ export const DoctorList: FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const specialty = searchParams.get('specialty') || '';
 
-  const { data, isLoading, isError, error, refetch } = useDoctors(specialty || undefined);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 300);
 
-  const filteredDoctors = useMemo(() => {
-    if (!data) return [];
-    if (!debouncedSearch.trim()) return data;
-
-    const query = debouncedSearch.trim().toLowerCase();
-    return data.filter((doctor) => {
-      const nameParts = doctor.name.toLowerCase().split(' ');
-      return nameParts.some((part) => part.includes(query));
-    });
-  }, [data, debouncedSearch]);
+  const { data, isLoading, isError, error, refetch } = useDoctors(
+    specialty || undefined,
+    debouncedSearch.trim() || undefined
+  );
 
   const hasSearchTerm = searchTerm.trim().length > 0;
   const hasFilters = hasSearchTerm || !!specialty;
@@ -194,9 +187,9 @@ export const DoctorList: FC = () => {
       </div>
 
       {/* Results */}
-      {filteredDoctors.length > 0 ? (
+      {data && data.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredDoctors.map((doctor) => (
+          {data.map((doctor) => (
             <DoctorCard key={doctor.id} doctor={doctor} />
           ))}
         </div>

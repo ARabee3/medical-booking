@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { format, parseISO, parse } from 'date-fns';
-import { CalendarDays, Clock, Loader2, ArrowRight } from 'lucide-react';
+import { CalendarDays, Clock, Loader2, ArrowRight, Star, Pencil } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,6 +19,9 @@ import {
   useCancelAppointment,
   useRescheduleAppointment,
 } from '@/features/appointments/api/appointmentsApi';
+import { useAppointmentReview } from '@/features/reviews/api/reviewsApi';
+import { ReviewForm } from '@/features/reviews/components/ReviewForm';
+import { StarRating } from '@/components/ui/star-rating';
 import { AvailabilityCalendar } from '@/features/doctors/components/AvailabilityCalendar';
 import type { Appointment } from '@/features/appointments/types';
 import { getStatusBadgeConfig } from '@/features/appointments/utils';
@@ -29,6 +32,10 @@ interface AppointmentCardProps {
 
 export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
   const { id, doctor, date, time, status, notes } = appointment;
+
+  // Review State
+  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const { data: existingReview } = useAppointmentReview(id);
 
   // Cancel State
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
@@ -306,9 +313,40 @@ export const AppointmentCard: FC<AppointmentCardProps> = ({ appointment }) => {
               </>
             )}
             {status === 'COMPLETED' && (
-              <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                Leave Review
-              </Button>
+              <>
+                {existingReview ? (
+                  <div className="flex items-center gap-2">
+                    <StarRating rating={existingReview.rating} size="sm" readonly />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                      onClick={() => setIsReviewDialogOpen(true)}
+                    >
+                      <Pencil className="h-3 w-3 mr-1" />
+                      Edit Review
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                    onClick={() => setIsReviewDialogOpen(true)}
+                  >
+                    <Star className="h-3 w-3 mr-1" />
+                    Leave Review
+                  </Button>
+                )}
+                <ReviewForm
+                  appointmentId={id}
+                  doctorId={doctor.id}
+                  doctorName={doctor.name}
+                  existingReview={existingReview}
+                  open={isReviewDialogOpen}
+                  onOpenChange={setIsReviewDialogOpen}
+                />
+              </>
             )}
           </div>
         )}

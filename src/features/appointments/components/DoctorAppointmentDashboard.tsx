@@ -1,6 +1,6 @@
 import { FC, useState, useMemo } from 'react';
 import { isPast, parseISO, parse, isToday, format } from 'date-fns';
-import { CalendarHeart, Check, X, CalendarDays, Clock } from 'lucide-react';
+import { CalendarHeart, Check, X, CalendarDays, Clock, CheckCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -66,6 +66,27 @@ const usePendingAction = (appointmentId: number) => {
   };
 
   return { notes, setNotes, updateMutation, handleAction };
+};
+
+// ─── Shared Logic for Completing Appointments ─────────────────────────────────
+const useCompleteAction = (appointmentId: number) => {
+  const updateMutation = useUpdateDoctorAppointment();
+
+  const handleComplete = () => {
+    updateMutation.mutate(
+      { id: appointmentId, updates: { status: 'COMPLETED' } },
+      {
+        onSuccess: () => {
+          toast.success('Appointment marked as completed');
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Failed to update appointment');
+        },
+      }
+    );
+  };
+
+  return { updateMutation, handleComplete };
 };
 
 // ─── Pending Table Row (Desktop) ────────────────────────────────────────────
@@ -174,6 +195,94 @@ const PendingCard: FC<{ appointment: Appointment }> = ({ appointment }) => {
             <X className="h-4 w-4 mr-1" /> Reject
           </Button>
         </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// ─── Upcoming Table Row (Desktop) ───────────────────────────────────────────
+const UpcomingRow: FC<{ appointment: Appointment }> = ({ appointment }) => {
+  const formattedDate = format(parseISO(appointment.date), 'MMM d, yyyy');
+  const formattedTime = format(parse(appointment.time, 'HH:mm', new Date()), 'h:mm a');
+  const patientName = appointment.patient?.name || 'Unknown Patient';
+  const badgeConfig = getStatusBadgeConfig(appointment.status);
+  const { updateMutation, handleComplete } = useCompleteAction(appointment.id);
+
+  return (
+    <TableRow>
+      <TableCell className="font-medium text-[var(--color-foreground)]">{patientName}</TableCell>
+      <TableCell>
+        <div className="flex items-center gap-1.5 text-[var(--color-foreground-muted)] whitespace-nowrap">
+          <CalendarDays className="h-4 w-4" /> {formattedDate}
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center gap-1.5 text-[var(--color-foreground-muted)] whitespace-nowrap">
+          <Clock className="h-4 w-4" /> {formattedTime}
+        </div>
+      </TableCell>
+      <TableCell>
+        <Badge variant={badgeConfig.variant} className={badgeConfig.className}>
+          {badgeConfig.label}
+        </Badge>
+      </TableCell>
+      <TableCell className="text-right">
+        <Button
+          size="sm"
+          variant="outline"
+          className="text-blue-600 border-blue-300 hover:bg-blue-50"
+          onClick={handleComplete}
+          disabled={updateMutation.isPending}
+        >
+          <CheckCircle className="h-4 w-4 mr-1" /> Complete
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
+};
+
+// ─── Upcoming Card (Mobile) ─────────────────────────────────────────────────
+const UpcomingCard: FC<{ appointment: Appointment }> = ({ appointment }) => {
+  const formattedDate = format(parseISO(appointment.date), 'MMM d, yyyy');
+  const formattedTime = format(parse(appointment.time, 'HH:mm', new Date()), 'h:mm a');
+  const patientName = appointment.patient?.name || 'Unknown Patient';
+  const badgeConfig = getStatusBadgeConfig(appointment.status);
+  const { updateMutation, handleComplete } = useCompleteAction(appointment.id);
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-3">
+        <div className="flex justify-between items-start">
+          <h3 className="font-semibold text-lg text-[var(--color-foreground)]">{patientName}</h3>
+          <Badge variant={badgeConfig.variant} className={badgeConfig.className}>
+            {badgeConfig.label}
+          </Badge>
+        </div>
+
+        <div className="flex flex-wrap gap-4 text-sm text-[var(--color-foreground-muted)]">
+          <div className="flex items-center gap-1.5">
+            <CalendarDays className="h-4 w-4" /> {formattedDate}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Clock className="h-4 w-4" /> {formattedTime}
+          </div>
+        </div>
+
+        {appointment.notes && (
+          <p className="text-sm text-[var(--color-foreground-muted)] italic border-l-2 border-[var(--color-border)] pl-2">
+            Notes: {appointment.notes}
+          </p>
+        )}
+
+        <Button
+          size="sm"
+          variant="outline"
+          className="w-full text-blue-600 border-blue-300 hover:bg-blue-50"
+          onClick={handleComplete}
+          disabled={updateMutation.isPending}
+        >
+          <CheckCircle className="h-4 w-4 mr-1" /> Mark as Completed
+        </Button>
       </CardContent>
     </Card>
   );
@@ -386,12 +495,12 @@ export const DoctorAppointmentDashboard: FC = () => {
                       <TableHead>Date</TableHead>
                       <TableHead>Time</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Notes</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {upcoming.map((appt) => (
-                      <AppointmentRow key={appt.id} appointment={appt} />
+                      <UpcomingRow key={appt.id} appointment={appt} />
                     ))}
                   </TableBody>
                 </Table>
@@ -400,7 +509,7 @@ export const DoctorAppointmentDashboard: FC = () => {
               {/* Mobile View */}
               <div className="md:hidden space-y-4">
                 {upcoming.map((appt) => (
-                  <AppointmentCardView key={appt.id} appointment={appt} />
+                  <UpcomingCard key={appt.id} appointment={appt} />
                 ))}
               </div>
             </>

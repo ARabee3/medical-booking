@@ -1,12 +1,20 @@
 import { FC, useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { format, parseISO, isPast, isToday } from 'date-fns';
-import { Trash2, PlusCircle, CalendarDays, Clock } from 'lucide-react';
+import { Trash2, PlusCircle, CalendarDays, Clock, AlertTriangle, Banknote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   useDoctorSlots,
   useAddSlot,
@@ -60,7 +68,9 @@ export const ScheduleManagement: FC = () => {
   const [date, setDate] = useState('');
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
+  const [price, setPrice] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [slotToDelete, setSlotToDelete] = useState<AvailabilitySlot | null>(null);
 
   // ── Resolve current doctor from auth context ──
   const { data: currentDoctor, isLoading: isDoctorLoading } = useCurrentDoctor();
@@ -110,15 +120,22 @@ export const ScheduleManagement: FC = () => {
       return;
     }
 
+    const parsedPrice = price.trim() === '' ? null : Number(price);
+    if (price.trim() !== '' && (isNaN(parsedPrice!) || parsedPrice! < 0)) {
+      setFormError('Price must be a non-negative number.');
+      return;
+    }
+
     // doctor_id and is_booked are excluded — backend assigns them automatically
     addSlot(
-      { date, start_time: startTime, end_time: endTime },
+      { date, start_time: startTime, end_time: endTime, price: parsedPrice },
       {
         onSuccess: () => {
           toast.success('Slot added successfully');
           setDate('');
           setStartTime('');
           setEndTime('');
+          setPrice('');
           setFormError(null);
         },
         onError: () => {
@@ -128,9 +145,17 @@ export const ScheduleManagement: FC = () => {
     );
   };
 
-  const handleDelete = (slot: AvailabilitySlot) => {
-    deleteSlot(slot.id, {
-      onSuccess: () => toast.success('Slot removed successfully'),
+  const handleDeleteRequest = (slot: AvailabilitySlot) => {
+    setSlotToDelete(slot);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!slotToDelete) return;
+    deleteSlot(slotToDelete.id, {
+      onSuccess: () => {
+        toast.success('Slot removed successfully');
+        setSlotToDelete(null);
+      },
       onError: () => toast.error('Failed to remove slot. Please try again.'),
     });
   };
@@ -223,6 +248,25 @@ export const ScheduleManagement: FC = () => {
               />
             </div>
 
+            <div className="space-y-1.5">
+              <Label htmlFor="slot-price" className="flex items-center gap-1.5">
+                <Banknote className="h-3.5 w-3.5 text-muted-foreground" />
+                Price (optional)
+              </Label>
+              <Input
+                id="slot-price"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="e.g., 150.00"
+                value={price}
+                onChange={(e) => {
+                  setPrice(e.target.value);
+                  setFormError(null);
+                }}
+              />
+            </div>
+
             {formError && <p className="text-sm text-destructive font-medium">{formError}</p>}
 
             <Button className="w-full" onClick={handleSubmit} disabled={isAdding}>
@@ -300,13 +344,26 @@ export const ScheduleManagement: FC = () => {
                                 {format(parseISO(`${slot.date}T${slot.end_time}`), 'h:mm a')}
                               </span>
                               <SlotBadge isBooked={slot.is_booked} />
+                              {slot.price !== null && slot.price > 0 && (
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs text-emerald-700 border-emerald-300 bg-emerald-50"
+                                >
+                                  ${Number(slot.price).toFixed(2)}
+                                </Badge>
+                              )}
+                              {slot.price === null && (
+                                <Badge variant="outline" className="text-xs text-muted-foreground">
+                                  Free
+                                </Badge>
+                              )}
                             </div>
 
                             <Button
                               variant="ghost"
                               size="sm"
                               className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0"
-                              onClick={() => handleDelete(slot)}
+                              onClick={() => handleDeleteRequest(slot)}
                               disabled={isDeleting || slot.is_booked}
                               title={slot.is_booked ? 'Cannot delete a booked slot' : 'Delete slot'}
                             >
@@ -323,6 +380,54 @@ export const ScheduleManagement: FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!slotToDelete} onOpenChange={(open) => !open && setSlotToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              Delete Availability Slot
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this slot? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+
+          {slotToDelete && (
+            <div className="rounded-lg border bg-muted/50 p-4 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Date</span>
+                <span className="font-medium">
+                  {format(parseISO(slotToDelete.date), 'EEEE, MMMM d, yyyy')}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Time</span>
+                <span className="font-medium">
+                  {format(parseISO(`${slotToDelete.date}T${slotToDelete.start_time}`), 'h:mm a')} —{' '}
+                  {format(parseISO(`${slotToDelete.date}T${slotToDelete.end_time}`), 'h:mm a')}
+                </span>
+              </div>
+              {slotToDelete.price !== null && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Price</span>
+                  <span className="font-medium">${Number(slotToDelete.price).toFixed(2)}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSlotToDelete(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm} disabled={isDeleting}>
+              {isDeleting ? 'Deleting...' : 'Delete Slot'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
