@@ -36,6 +36,25 @@ const fetchDoctorAvailability = async (
   return data;
 };
 
+type AvailabilitySummary = {
+  doctor_id: number;
+  from: string;
+  to: string;
+  slots_by_date: Record<string, number>;
+  total: number;
+};
+
+const fetchAvailabilitySummary = async (
+  doctorId: number,
+  from: string,
+  to: string
+): Promise<AvailabilitySummary> => {
+  const { data } = await api.get(`/doctors/${doctorId}/availability/summary/`, {
+    params: { from, to },
+  });
+  return data;
+};
+
 const fetchDoctorSlots = async (doctorId: number): Promise<AvailabilitySlot[]> => {
   const { data } = await api.get('/doctor/availability/', {
     params: { doctor_id: doctorId },
@@ -86,6 +105,14 @@ export const useDoctorAvailability = (doctorId: number, date: string) => {
     queryKey: ['availability', doctorId, date],
     queryFn: () => fetchDoctorAvailability(doctorId, date),
     enabled: !!doctorId && !!date,
+  });
+};
+
+export const useAvailabilitySummary = (doctorId: number, from: string, to: string) => {
+  return useQuery({
+    queryKey: ['availability-summary', doctorId, from, to],
+    queryFn: () => fetchAvailabilitySummary(doctorId, from, to),
+    enabled: !!doctorId && !!from && !!to,
   });
 };
 
