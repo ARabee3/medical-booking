@@ -144,7 +144,7 @@ const deleteAvatar = async (): Promise<Doctor> => {
   return data;
 };
 
-const updateDoctorProfile = async (id: number, updates: Partial<Doctor>): Promise<Doctor> => {
+const updateDoctorProfile = async (_id: number, updates: Partial<Doctor>): Promise<Doctor> => {
   const { data } = await api.patch('/doctors/me/update/', updates);
   return data;
 };
